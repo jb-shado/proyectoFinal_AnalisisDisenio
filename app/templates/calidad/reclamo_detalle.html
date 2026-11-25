@@ -1,0 +1,38 @@
+{% extends "calidad/base.html" %}
+{% from "calidad/macros.html" import tabla, estado %}
+{% set bp = 'calidad' %}
+{% block titulo %}Reclamo {{ r.numero_reclamo }}{% endblock %}
+{% block contenido %}
+<a href="{{ url_for(bp ~ '.reclamos') }}">Volver a reclamos</a>
+<div class="barra"><h1>Reclamo {{ r.numero_reclamo }}</h1>{{ estado(r.estado) }}</div>
+
+<dl class="ficha">
+  <div><dt>Cliente</dt><dd>{{ r.cliente }}</dd></div>
+  <div><dt>Contacto</dt><dd>{{ r.telefono or '—' }}{% if r.email %} · {{ r.email }}{% endif %}</dd></div>
+  <div><dt>Factura</dt><dd>{{ r.numero_factura or '—' }}</dd></div>
+  <div><dt>Producto y lote</dt><dd>{{ r.producto or '—' }} {{ r.numero_lote or '' }}</dd></div>
+  <div class="ancho" style="grid-column:1/-1"><dt>Qué reporta el cliente</dt><dd style="font-weight:400">{{ r.descripcion }}</dd></div>
+</dl>
+
+<h2>Origen del lote (proveedores)</h2>
+{{ tabla([('Insumo','insumo'),('Lote de insumo','lote_insumo'),('Proveedor','proveedor'),('Cantidad','cantidad_consumida')], atras,
+         'Este reclamo no tiene lote asociado o el lote no tiene insumos registrados.') }}
+
+<h2>Otros clientes que recibieron el lote</h2>
+{{ tabla([('Cliente','cliente'),('Factura','numero_factura'),('Cantidad','cantidad'),('Fecha','fecha_emision')], adelante,
+         'No hay otras entregas de este lote.') }}
+
+<h2>Resolución</h2>
+<form class="campos" method="post" action="{{ url_for(bp ~ '.atender_reclamo', id=r.id_reclamo) }}">
+  <label>Estado
+    <select name="estado">
+      {% for v, t in [('en_revision','En revisión'), ('resuelto','Resuelto'), ('cerrado','Cerrado sin cambios')] %}
+      <option value="{{ v }}" {{ 'selected' if v == r.estado }}>{{ t }}</option>{% endfor %}
+    </select>
+  </label>
+  <label class="ancho">Qué se hizo
+    <textarea name="resolucion" placeholder="Ej.: se reemplazó el producto y se retuvo el lote">{{ r.resolucion or '' }}</textarea>
+  </label>
+  <div><button class="btn">Guardar resolución</button></div>
+</form>
+{% endblock %}

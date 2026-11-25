@@ -1,0 +1,21 @@
+{% extends "vendedor/base.html" %}
+{% from "vendedor/macros.html" import tabla %}
+{% set ep = 'ventas.reclamo_detalle' %}
+{% block titulo %}Reclamos{% endblock %}
+{% block contenido %}
+<h1>Reclamos de clientes</h1>
+<p class="sub">Abre un reclamo para ver el lote involucrado, sus proveedores y los demás clientes que lo recibieron.</p>
+<form class="filtros" method="get">
+  <label>Estado
+    <select name="estado" onchange="this.form.submit()">
+      {% for v, t in [('', 'Todos'), ('abierto','Abiertos'), ('en_revision','En revisión'), ('resuelto','Resueltos'), ('cerrado','Cerrados')] %}
+      <option value="{{ v }}" {{ 'selected' if v == estado }}>{{ t }}</option>{% endfor %}
+    </select>
+  </label>
+  <noscript><button class="btn sec">Filtrar</button></noscript>
+</form>
+{% call(r) tabla([('Reclamo','numero_reclamo'),('Cliente','cliente'),('Factura','numero_factura'),('Lote','numero_lote'),('Fecha','fecha'),('Estado','estado')],
+                 reclamos, 'No hay reclamos con este filtro.') %}
+  <a class="btn sec chico" href="{{ url_for(ep, id=r.id_reclamo) }}">Atender</a>
+{% endcall %}
+{% endblock %}

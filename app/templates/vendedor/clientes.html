@@ -1,0 +1,15 @@
+{% extends "vendedor/base.html" %}
+{% from "vendedor/macros.html" import tabla %}
+{% block titulo %}Clientes{% endblock %}
+{% block contenido %}
+<div class="barra"><div><h1>Clientes</h1><p class="sub">Datos comerciales, límite de crédito y saldo pendiente.</p></div>
+<a class="btn" href="{{ url_for('ventas.cliente_nuevo') }}">Nuevo cliente</a></div>
+<form class="filtros" method="get">
+  <label>Buscar <input name="q" value="{{ buscar }}" placeholder="Razón social o NIT/CI"></label>
+  <button class="btn sec">Buscar</button>
+</form>
+{% call(c) tabla([('NIT/CI','nit_ci'),('Razón social','razon_social'),('Contacto','nombre_contacto'),('Teléfono','telefono'),('Límite de crédito','limite_credito'),('Saldo pendiente','saldo_pendiente')],
+                 clientes, 'No se encontraron clientes.') %}
+  <a class="btn sec chico" href="{{ url_for('ventas.cliente_editar', id=c.id_cliente) }}">Editar</a>
+{% endcall %}
+{% endblock %}

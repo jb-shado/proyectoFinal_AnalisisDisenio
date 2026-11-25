@@ -1,0 +1,26 @@
+{% extends "vendedor/base.html" %}
+{% from "vendedor/macros.html" import tabla %}
+{% block titulo %}Pedidos en línea{% endblock %}
+{% block contenido %}
+<h1>Pedidos en línea</h1>
+<p class="sub">Pedidos hechos por clientes desde el portal. Confirma los que tengan stock y rechaza los demás con un motivo.</p>
+{% for p in pedidos %}
+<section class="tarjeta">
+  <header>
+    <div><strong>{{ p.numero_pedido }}</strong> · {{ p.cliente }}<br><small>{{ p.fecha_pedido }} · Total Bs {{ p.total }}</small></div>
+    {% if not p.hay_stock %}<span class="sin-stock">Stock insuficiente</span>{% endif %}
+  </header>
+  <div class="tabla-wrap"><table>
+    <thead><tr><th>Producto</th><th class="num">Pide</th><th class="num">Stock</th></tr></thead>
+    <tbody>{% for l in p.lineas %}<tr><td>{{ l.producto }}</td><td class="num">{{ l.cantidad }}</td>
+      <td class="num {{ 'sin-stock' if l.stock < l.cantidad }}">{{ l.stock }}</td></tr>{% endfor %}</tbody>
+  </table></div>
+  <form class="en-linea" method="post" style="margin-top:.75rem">
+    <input name="motivo" placeholder="Motivo (obligatorio al rechazar)" aria-label="Motivo">
+    <button class="btn chico" formaction="{{ url_for('ventas.resolver_pedido_online', id=p.id_pedido, accion='confirmar') }}"
+      {{ 'disabled' if not p.hay_stock }}>Confirmar</button>
+    <button class="btn peligro chico" formaction="{{ url_for('ventas.resolver_pedido_online', id=p.id_pedido, accion='rechazar') }}">Rechazar</button>
+  </form>
+</section>
+{% else %}<p class="vacio">No hay pedidos en línea pendientes.</p>{% endfor %}
+{% endblock %}

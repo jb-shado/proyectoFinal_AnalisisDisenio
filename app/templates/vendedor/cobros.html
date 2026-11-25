@@ -1,0 +1,24 @@
+{% extends "vendedor/base.html" %}
+{% from "vendedor/macros.html" import tabla %}
+{% block titulo %}Cobros{% endblock %}
+{% block contenido %}
+<h1>Cobros</h1>
+<p class="sub">Facturas con saldo pendiente, ordenadas por vencimiento. Registra aquí cada pago del cliente.</p>
+{% if cobros %}
+<div class="tabla-wrap"><table>
+  <thead><tr><th>Factura</th><th>Cliente</th><th>Vence</th><th class="num">Mora (días)</th><th class="num">Saldo</th><th>Registrar pago</th></tr></thead>
+  <tbody>{% for c in cobros %}<tr>
+    <td>{{ c.numero_factura }}</td><td>{{ c.cliente }}</td><td>{{ c.fecha_vencimiento }}</td>
+    <td class="num {{ 'sin-stock' if c.dias_mora > 0 }}">{{ c.dias_mora }}</td><td class="num">{{ c.saldo }}</td>
+    <td><form class="en-linea" method="post" action="{{ url_for('ventas.registrar_pago', id_cxc=c.id_cxc) }}">
+      <input type="hidden" name="saldo" value="{{ c.saldo }}">
+      <input class="corto" type="number" name="monto" step="0.01" min="0.01" max="{{ c.saldo }}" placeholder="Monto" required aria-label="Monto">
+      <select name="metodo" aria-label="Método"><option>Efectivo</option><option>Transferencia</option><option>Cheque</option></select>
+      <input class="corto" name="referencia" placeholder="Ref." aria-label="Referencia">
+      <button class="btn chico">Cobrar</button></form></td>
+  </tr>{% endfor %}</tbody>
+</table></div>
+{% else %}<p class="vacio">No hay cobros pendientes.</p>{% endif %}
+<h2>Últimos pagos</h2>
+{{ tabla([('Fecha','fecha'),('Cliente','cliente'),('Factura','numero_factura'),('Monto','monto'),('Método','metodo_pago'),('Referencia','referencia')], pagos, 'Aún no se registraron pagos.') }}
+{% endblock %}

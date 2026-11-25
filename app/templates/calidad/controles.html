@@ -1,0 +1,33 @@
+{% extends "calidad/base.html" %}
+{% from "calidad/macros.html" import tabla %}
+{% block titulo %}Control de calidad{% endblock %}
+{% block contenido %}
+<h1>Control de calidad</h1>
+<p class="sub">Registra una medición o inspección sobre un lote de producto o de insumo.</p>
+
+<form class="campos" method="post">
+  <label class="ancho">Lote
+    <select name="lote" required>
+      <option value="">Elige un lote</option>
+      {% for l in lotes %}<option value="{{ l.tipo }}:{{ l.id_lote }}">{{ l.numero_lote }} · {{ l.item }} ({{ l.tipo }})</option>{% endfor %}
+    </select>
+  </label>
+  <label>Tipo de control
+    <input name="tipo_control" list="tipos" required placeholder="Temperatura">
+    <datalist id="tipos"><option>Temperatura</option><option>Inspección visual</option><option>Microbiológico</option><option>pH</option><option>Peso</option></datalist>
+  </label>
+  <label>Resultado
+    <select name="resultado" required>
+      <option value="aprobado">Aprobado</option><option value="observado">Observado</option><option value="rechazado">Rechazado</option>
+    </select>
+  </label>
+  <label>Valor medido <input name="valor_medido" type="number" step="0.001" placeholder="Opcional"></label>
+  <label>Unidad <input name="unidad_medida" placeholder="°C"></label>
+  <label class="ancho">Observación <textarea name="observacion" placeholder="Qué viste o por qué se rechaza"></textarea></label>
+  <div><button class="btn">Registrar control</button></div>
+</form>
+
+<h2>Historial reciente</h2>
+{{ tabla([('Fecha','fecha'),('Lote','lote'),('Control','tipo_control'),('Valor','valor_medido'),('Unidad','unidad_medida'),('Resultado','resultado'),('Responsable','responsable')],
+         historial, 'Aún no hay controles registrados.') }}
+{% endblock %}

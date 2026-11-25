@@ -1,0 +1,20 @@
+{% extends "rrhh/base.html" %}
+{% from "rrhh/macros.html" import tabla %}
+{% block titulo %}Personal{% endblock %}
+{% block contenido %}
+<div class="barra"><div><h1>Personal</h1><p class="sub">Registro de empleados y sus cargos.</p></div>
+<a class="btn" href="{{ url_for('rrhh.empleado_nuevo') }}">Nuevo empleado</a></div>
+<form class="filtros" method="get">
+  <label>Buscar <input name="q" value="{{ buscar }}" placeholder="Nombre, CI o código"></label>
+  <label style="flex-direction:row;align-items:center;gap:.5rem"><input type="checkbox" name="bajas" value="1" style="width:auto" {{ 'checked' if ver_bajas }}> Incluir bajas</label>
+  <button class="btn sec">Buscar</button>
+</form>
+{% call(e) tabla([('Código','codigo_empleado'),('Nombre','nombre'),('CI','ci'),('Cargo','cargo'),('Teléfono','telefono'),('Ingreso','fecha_ingreso'),('Estado','estado')],
+                 empleados, 'No se encontró personal.') %}
+  <a class="btn sec chico" href="{{ url_for('rrhh.empleado_editar', id=e.id_empleado) }}">Editar</a>
+  {% if e.estado == 'activo' %}
+  <form class="en-linea" method="post" action="{{ url_for('rrhh.empleado_baja', id=e.id_empleado) }}"
+        onsubmit="return confirm('¿Dar de baja a {{ e.nombre }}?')"><button class="btn peligro chico">Dar de baja</button></form>
+  {% endif %}
+{% endcall %}
+{% endblock %}

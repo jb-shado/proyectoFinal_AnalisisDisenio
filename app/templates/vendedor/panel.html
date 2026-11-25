@@ -1,0 +1,16 @@
+{% extends "vendedor/base.html" %}
+{% from "vendedor/macros.html" import kpi, atajos, tabla %}
+{% block titulo %}Panel del vendedor{% endblock %}
+{% block contenido %}
+<h1>Ventas</h1>
+<p class="sub">Pedidos por atender, cobros pendientes y accesos del rol.</p>
+<div class="kpis">
+  {{ kpi(kpis.pedidos_pendientes|default(0), 'Pedidos por confirmar', true) }}
+  {{ kpi(kpis.online_pendientes|default(0), 'Pedidos en línea por resolver', true) }}
+  {{ kpi('Bs ' ~ ('%.2f'|format(kpis.por_cobrar|default(0))), 'Por cobrar') }}
+  {{ kpi(kpis.reclamos_abiertos|default(0), 'Reclamos abiertos', true) }}
+</div>
+{{ atajos(menu) }}
+<h2>Pedidos recientes</h2>
+{{ tabla([('Pedido','numero_pedido'),('Cliente','cliente'),('Total','total'),('Estado','estado')], recientes, 'Aún no hay pedidos.') }}
+{% endblock %}

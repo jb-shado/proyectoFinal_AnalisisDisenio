@@ -1,0 +1,24 @@
+{% extends "calidad/base.html" %}
+{% from "calidad/macros.html" import kpi, atajos, tabla %}
+{% block titulo %}Panel de calidad{% endblock %}
+{% block contenido %}
+<h1>Calidad</h1>
+<p class="sub">Lo que necesita tu decisión hoy y las pantallas del rol.</p>
+<div class="kpis">
+  {{ kpi(kpis.lotes_pendientes|default(0), 'Lotes esperando decisión', true) }}
+  {{ kpi(kpis.controles_hoy|default(0), 'Controles registrados hoy') }}
+  {{ kpi(kpis.rechazos_30d|default(0), 'Rechazos en 30 días') }}
+  {{ kpi(kpis.lotes_por_vencer|default(0), 'Lotes por vencer (30 días)', true) }}
+  {{ kpi(kpis.reclamos_pendientes|default(0), 'Reclamos sin resolver', true) }}
+</div>
+{{ atajos(menu) }}
+
+<h2>Lotes esperando decisión</h2>
+{% call(l) tabla([('Lote','numero_lote'),('Producto','producto'),('Producido','fecha_produccion'),('Vence','fecha_vencimiento'),('Cantidad','cantidad_actual')],
+                 pendientes, 'No hay lotes en cuarentena.') %}
+  <a class="btn sec chico" href="{{ url_for('calidad.decision') }}">Decidir</a>
+{% endcall %}
+
+<h2>Últimos controles</h2>
+{{ tabla([('Fecha','fecha'),('Lote','lote'),('Control','tipo_control'),('Resultado','resultado')], ultimos, 'Aún no hay controles registrados.') }}
+{% endblock %}

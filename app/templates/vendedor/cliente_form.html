@@ -1,0 +1,16 @@
+{% extends "vendedor/base.html" %}
+{% block titulo %}{{ 'Editar' if id else 'Nuevo' }} cliente{% endblock %}
+{% block contenido %}
+<a href="{{ url_for('ventas.clientes') }}">Volver a clientes</a>
+<h1>{{ 'Editar cliente' if id else 'Nuevo cliente' }}</h1>
+<form class="campos" method="post">
+  <label>Razón social <input name="razon_social" value="{{ c.razon_social or '' }}" required></label>
+  <label>NIT / CI <input name="nit_ci" value="{{ c.nit_ci or '' }}"></label>
+  <label>Contacto <input name="nombre_contacto" value="{{ c.nombre_contacto or '' }}"></label>
+  <label>Teléfono <input name="telefono" value="{{ c.telefono or '' }}"></label>
+  <label>Correo <input type="email" name="email" value="{{ c.email or '' }}"></label>
+  <label>Límite de crédito (Bs) <input type="number" step="0.01" min="0" name="limite_credito" value="{{ c.limite_credito or 0 }}"></label>
+  <label class="ancho">Dirección <input name="direccion" value="{{ c.direccion or '' }}"></label>
+  <div><button class="btn">Guardar cliente</button></div>
+</form>
+{% endblock %}

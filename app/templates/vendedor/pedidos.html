@@ -1,0 +1,19 @@
+{% extends "vendedor/base.html" %}
+{% from "vendedor/macros.html" import tabla %}
+{% block titulo %}Pedidos{% endblock %}
+{% block contenido %}
+<div class="barra"><div><h1>Pedidos</h1><p class="sub">Al crear un pedido verás el stock disponible en ese momento.</p></div>
+<a class="btn" href="{{ url_for('ventas.pedido_nuevo') }}">Nuevo pedido</a></div>
+<form class="filtros" method="get">
+  <label>Estado
+    <select name="estado" onchange="this.form.submit()">
+      {% for v, t in [('', 'Todos'), ('pendiente','Pendientes'), ('confirmado','Confirmados'), ('despachado','Despachados'), ('entregado','Entregados'), ('rechazado','Rechazados')] %}
+      <option value="{{ v }}" {{ 'selected' if v == estado }}>{{ t }}</option>{% endfor %}
+    </select>
+  </label>
+</form>
+{% call(p) tabla([('Pedido','numero_pedido'),('Cliente','cliente'),('Origen','origen'),('Fecha','fecha'),('Entrega','entrega'),('Total','total'),('Estado','estado')],
+                 pedidos, 'No hay pedidos con este filtro.') %}
+  <a class="btn sec chico" href="{{ url_for('ventas.pedido_detalle', id=p.id_pedido) }}">Ver</a>
+{% endcall %}
+{% endblock %}

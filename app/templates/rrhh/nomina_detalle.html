@@ -1,0 +1,17 @@
+{% extends "rrhh/base.html" %}
+{% from "rrhh/macros.html" import tabla, estado %}
+{% block titulo %}Nómina {{ n.periodo }}{% endblock %}
+{% block contenido %}
+<a href="{{ url_for('rrhh.nomina') }}">Volver a nómina</a>
+<div class="barra"><h1>Nómina {{ n.periodo }}</h1>{{ estado(n.estado) }}</div>
+<dl class="ficha">
+  <div><dt>Total haberes</dt><dd>Bs {{ n.total_haberes }}</dd></div>
+  <div><dt>Total descuentos</dt><dd>Bs {{ n.total_descuentos }}</dd></div>
+  <div><dt>Total neto</dt><dd>Bs {{ n.total_neto }}</dd></div>
+</dl>
+{{ tabla([('Código','codigo_empleado'),('Empleado','empleado'),('Cargo','cargo'),('Días asistidos','dias_trabajados'),('Haberes','haberes'),('Descuentos','descuentos'),('Neto','neto')], filas, 'Esta nómina no tiene empleados.') }}
+<form class="en-linea" method="post" action="{{ url_for('rrhh.nomina_estado', id=n.id_nomina) }}" style="margin-top:1rem">
+  {% if n.estado == 'borrador' %}<button class="btn" name="estado" value="aprobada">Aprobar nómina</button>
+  {% elif n.estado == 'aprobada' %}<button class="btn" name="estado" value="pagada">Marcar como pagada</button>{% endif %}
+</form>
+{% endblock %}

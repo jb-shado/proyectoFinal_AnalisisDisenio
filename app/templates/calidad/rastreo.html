@@ -1,0 +1,27 @@
+{% extends "calidad/base.html" %}
+{% from "calidad/macros.html" import tabla %}
+{% set atras = sentido == 'atras' %}
+{% block titulo %}Rastreo hacia {{ 'atrás' if atras else 'adelante' }}{% endblock %}
+{% block contenido %}
+<h1>Rastreo hacia {{ 'atrás' if atras else 'adelante' }}</h1>
+<p class="sub">{{ 'Desde un lote de producto terminado, ve qué lotes de insumo se usaron y quién los proveyó.' if atras
+   else 'Desde un lote de producto terminado, ve a qué clientes se entregó y en qué factura.' }}</p>
+
+<form class="filtros" method="get">
+  <label>Número de lote
+    <input name="lote" list="lotes" value="{{ lote }}" placeholder="LP-2026-001" required>
+    <datalist id="lotes">{% for l in lotes %}<option value="{{ l.numero_lote }}">{{ l.producto }}</option>{% endfor %}</datalist>
+  </label>
+  <button class="btn">Rastrear lote</button>
+</form>
+
+{% if filas is none %}
+  <p class="vacio">Escribe un lote para ver su recorrido.</p>
+{% elif atras %}
+  {{ tabla([('Insumo','insumo'),('Lote de insumo','lote_insumo'),('Proveedor','proveedor'),('Cantidad usada','cantidad_consumida'),('Fecha','fecha_consumo')],
+           filas, 'No hay consumo de insumos registrado para el lote ' ~ lote ~ '. Revisa que el lote tenga orden de producción asociada.') }}
+{% else %}
+  {{ tabla([('Cliente','cliente'),('Factura','numero_factura'),('Cantidad','cantidad'),('Fecha','fecha_emision')],
+           filas, 'El lote ' ~ lote ~ ' todavía no se asignó a ningún pedido.') }}
+{% endif %}
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "rrhh/base.html" %}
+{% block titulo %}Asistencia diaria{% endblock %}
+{% block contenido %}
+<h1>Asistencia diaria</h1>
+<p class="sub">Anota entrada y salida de cada empleado. Las horas se calculan solas y alimentan la nómina.</p>
+<form class="filtros" method="get">
+  <label>Fecha <input type="date" name="fecha" value="{{ fecha }}" onchange="this.form.submit()"></label>
+</form>
+{% if filas %}
+<form method="post">
+  <input type="hidden" name="fecha" value="{{ fecha }}">
+  <div class="tabla-wrap"><table>
+    <thead><tr><th>Empleado</th><th>Cargo</th><th>Entrada</th><th>Salida</th><th class="num">Horas</th><th>Observación</th></tr></thead>
+    <tbody>{% for f in filas %}<tr>
+      <td>{{ f.nombre }}<input type="hidden" name="id_empleado" value="{{ f.id_empleado }}"></td>
+      <td>{{ f.cargo or '—' }}</td>
+      <td><input type="time" name="entrada_{{ f.id_empleado }}" value="{{ f.hora_entrada or '' }}" aria-label="Entrada de {{ f.nombre }}"></td>
+      <td><input type="time" name="salida_{{ f.id_empleado }}" value="{{ f.hora_salida or '' }}" aria-label="Salida de {{ f.nombre }}"></td>
+      <td class="num">{{ f.horas_trabajadas if f.horas_trabajadas is not none else '—' }}</td>
+      <td><input name="obs_{{ f.id_empleado }}" value="{{ f.observacion or '' }}" aria-label="Observación"></td>
+    </tr>{% endfor %}</tbody>
+  </table></div>
+  <p style="margin-top:1rem"><button class="btn">Guardar asistencia</button></p>
+</form>
+{% else %}<p class="vacio">No hay empleados activos. Registra personal primero.</p>{% endif %}
+{% endblock %}

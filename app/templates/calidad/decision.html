@@ -1,0 +1,25 @@
+{% extends "calidad/base.html" %}
+{% from "calidad/macros.html" import tabla %}
+{% block titulo %}Aprobar o rechazar{% endblock %}
+{% block contenido %}
+<h1>Aprobar o rechazar lotes</h1>
+<p class="sub">Un lote aprobado queda disponible para venta. Uno rechazado no se puede despachar.</p>
+<form class="filtros" method="get">
+  <label>Mostrar lotes
+    <select name="estado" onchange="this.form.submit()">
+      {% for v, t in [('cuarentena','En cuarentena'), ('disponible','Aprobados'), ('rechazado','Rechazados')] %}
+      <option value="{{ v }}" {{ 'selected' if v == estado }}>{{ t }}</option>{% endfor %}
+    </select>
+  </label>
+</form>
+{% call(l) tabla([('Lote','numero_lote'),('Producto','producto'),('Vence','fecha_vencimiento'),('Cantidad','cantidad_actual'),('Último control','ultimo_control')],
+                 lotes, 'No hay lotes en este estado.') %}
+  <form class="en-linea" method="post">
+    <input type="hidden" name="id_lote" value="{{ l.id_lote_producto }}">
+    <input name="motivo" placeholder="Motivo" aria-label="Motivo de la decisión">
+    {% if estado != 'disponible' %}<button class="btn chico" name="accion" value="aprobar">Aprobar</button>{% endif %}
+    {% if estado != 'rechazado' %}<button class="btn peligro chico" name="accion" value="rechazar"
+      onclick="return confirm('¿Rechazar el lote {{ l.numero_lote }}?')">Rechazar</button>{% endif %}
+  </form>
+{% endcall %}
+{% endblock %}

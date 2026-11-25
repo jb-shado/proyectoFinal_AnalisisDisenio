@@ -1,0 +1,19 @@
+{% extends "rrhh/base.html" %}
+{% from "rrhh/macros.html" import kpi, atajos, tabla %}
+{% block titulo %}Panel de RR. HH.{% endblock %}
+{% block contenido %}
+<h1>Recursos humanos</h1>
+<p class="sub">Estado del personal y capacitaciones que requieren acción.</p>
+<div class="kpis">
+  {{ kpi(kpis.empleados_activos|default(0), 'Empleados activos') }}
+  {{ kpi(kpis.asistencias_hoy|default(0), 'Marcaciones de hoy') }}
+  {{ kpi(kpis.por_vencer|default(0), 'Capacitaciones por vencer', true) }}
+  {{ kpi(kpis.vencidas|default(0), 'Capacitaciones vencidas', true) }}
+  {{ kpi(kpis.ultima_nomina|default('—'), 'Última nómina') }}
+</div>
+{{ atajos(menu) }}
+<h2>Capacitaciones por renovar</h2>
+{% call(a) tabla([('Empleado','empleado'),('Capacitación','capacitacion'),('Vence','fecha_vencimiento'),('Días','dias_restantes')], alertas, 'No hay capacitaciones por vencer en los próximos 30 días.') %}
+  <a class="btn sec chico" href="{{ url_for('rrhh.capacitaciones') }}">Renovar</a>
+{% endcall %}
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "vendedor/base.html" %}
+{% from "vendedor/macros.html" import tabla %}
+{% block titulo %}Facturas y despachos{% endblock %}
+{% block contenido %}
+<h1>Facturas y despachos</h1>
+<p class="sub">Emite la factura de un pedido confirmado y asigna los lotes que se entregan.</p>
+<h2>Pedidos por facturar</h2>
+{% call(p) tabla([('Pedido','numero_pedido'),('Cliente','cliente'),('Total','total')], por_facturar, 'No hay pedidos confirmados sin factura.') %}
+  <form class="en-linea" method="post" action="{{ url_for('ventas.emitir_factura', id_pedido=p.id_pedido) }}"><button class="btn chico">Emitir factura</button></form>
+{% endcall %}
+<h2>Facturas emitidas</h2>
+{% call(f) tabla([('Factura','numero_factura'),('Cliente','cliente'),('Fecha','fecha'),('Total','total'),('Saldo','saldo_pendiente'),('Estado','estado'),('Despacho','despacho')],
+                 facturas, 'Aún no hay facturas.') %}
+  <a class="btn sec chico" href="{{ url_for('ventas.factura_detalle', id=f.id_factura) }}">Abrir</a>
+{% endcall %}
+{% endblock %}

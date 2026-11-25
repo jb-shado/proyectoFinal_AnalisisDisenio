@@ -1,0 +1,44 @@
+{% extends "vendedor/base.html" %}
+{% from "vendedor/macros.html" import tabla, estado %}
+{% block titulo %}Factura {{ f.numero_factura }}{% endblock %}
+{% block contenido %}
+<a href="{{ url_for('ventas.facturas') }}">Volver a facturas</a>
+<div class="barra"><h1>Factura {{ f.numero_factura }}</h1>{{ estado(f.estado) }}</div>
+<dl class="ficha">
+  <div><dt>Cliente</dt><dd>{{ f.cliente }}</dd></div>
+  <div><dt>Pedido</dt><dd>{{ f.numero_pedido or '—' }}</dd></div>
+  <div><dt>Total</dt><dd>Bs {{ f.total }}</dd></div>
+  <div><dt>Saldo</dt><dd>Bs {{ f.saldo_pendiente }}</dd></div>
+  <div><dt>Despacho</dt><dd>{% if f.numero_nota %}{{ f.numero_nota }} {{ estado(f.despacho) }}{% else %}Sin nota de despacho{% endif %}</dd></div>
+</dl>
+
+<h2>Lo que se debe entregar</h2>
+{{ tabla([('Producto','producto'),('Cantidad','cantidad'),('Precio','precio_unitario')], lineas) }}
+
+<h2>Lotes asignados</h2>
+{{ tabla([('Producto','producto'),('Lote','numero_lote'),('Cantidad','cantidad'),('Vence','fecha_vencimiento')], asignados, 'Todavía no se asignó ningún lote.') }}
+
+{% if not asignados %}
+<h2>Asignar lotes</h2>
+<p class="sub">Primero aparecen los lotes que vencen antes. Al guardar se descuenta el stock y se crea la nota de despacho.</p>
+<form method="post" action="{{ url_for('ventas.asignar_lotes', id=f.id_factura) }}">
+  {% if candidatos %}
+  <div class="tabla-wrap"><table>
+    <thead><tr><th>Producto</th><th>Lote</th><th>Vence</th><th class="num">Disponible</th><th class="num">Entregar</th></tr></thead>
+    <tbody>{% for l in candidatos %}<tr><td>{{ l.producto }}</td><td>{{ l.numero_lote }}</td><td>{{ l.fecha_vencimiento }}</td>
+      <td class="num">{{ l.cantidad_actual }}</td>
+      <td class="num"><input class="corto" type="number" min="0" max="{{ l.cantidad_actual }}" step="1" value="0" name="lote_{{ l.id_lote_producto }}" aria-label="Cantidad del lote {{ l.numero_lote }}"></td></tr>{% endfor %}</tbody>
+  </table></div>
+  <div class="campos" style="margin-top:1rem">
+    <label>Transportista <input name="transportista" placeholder="TransBolivia"></label>
+    <label>Dirección de entrega <input name="direccion" placeholder="Si está vacía se usa la del cliente"></label>
+    <div><button class="btn">Asignar lotes y despachar</button></div>
+  </div>
+  {% else %}<p class="vacio">No hay lotes aprobados con stock para los productos de este pedido.</p>{% endif %}
+</form>
+{% elif f.despacho != 'entregada' and f.id_nota %}
+<form method="post" action="{{ url_for('ventas.marcar_entregado', id=f.id_factura) }}" style="margin-top:1rem">
+  <button class="btn">Confirmar entrega al cliente</button>
+</form>
+{% endif %}
+{% endblock %}

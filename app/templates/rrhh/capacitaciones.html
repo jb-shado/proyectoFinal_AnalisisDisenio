@@ -1,0 +1,33 @@
+{% extends "rrhh/base.html" %}
+{% from "rrhh/macros.html" import tabla %}
+{% block titulo %}Capacitaciones{% endblock %}
+{% block contenido %}
+<h1>Capacitaciones</h1>
+<p class="sub">Se avisa 30 días antes del vencimiento. Registrar una nueva realización renueva la vigencia.</p>
+
+<form class="filtros" method="get">
+  <label>Mostrar
+    <select name="estado" onchange="this.form.submit()">
+      {% for v, t in [('', 'Todas'), ('vencida','Vencidas'), ('por_vencer','Por vencer'), ('vigente','Vigentes')] %}
+      <option value="{{ v }}" {{ 'selected' if v == estado }}>{{ t }}</option>{% endfor %}
+    </select>
+  </label>
+</form>
+{{ tabla([('Empleado','empleado'),('Capacitación','capacitacion'),('Realizada','fecha_realizacion'),('Vence','fecha_vencimiento'),('Días','dias_restantes'),('Estado','estado')],
+         alertas, 'No hay capacitaciones con este filtro.') }}
+
+<h2>Registrar capacitación realizada</h2>
+<form class="campos" method="post">
+  <label>Empleado
+    <select name="id_empleado" required><option value="">Elige un empleado</option>
+      {% for e in empleados %}<option value="{{ e.id_empleado }}">{{ e.nombre }}</option>{% endfor %}</select>
+  </label>
+  <label>Capacitación
+    <select name="id_capacitacion" required><option value="">Elige una capacitación</option>
+      {% for c in catalogo %}<option value="{{ c.id_capacitacion }}">{{ c.nombre }}{% if c.vigencia_meses %} ({{ c.vigencia_meses }} meses){% endif %}</option>{% endfor %}</select>
+  </label>
+  <label>Fecha de realización <input type="date" name="fecha" value="{{ hoy }}" max="{{ hoy }}" required></label>
+  <label style="flex-direction:row;align-items:center;gap:.5rem"><input type="checkbox" name="aprobado" checked style="width:auto"> Aprobó</label>
+  <div><button class="btn">Registrar</button></div>
+</form>
+{% endblock %}

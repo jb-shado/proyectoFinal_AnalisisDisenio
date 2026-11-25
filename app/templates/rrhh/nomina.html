@@ -1,0 +1,14 @@
+{% extends "rrhh/base.html" %}
+{% from "rrhh/macros.html" import tabla %}
+{% block titulo %}Nómina{% endblock %}
+{% block contenido %}
+<h1>Nómina</h1>
+<p class="sub">El sueldo se calcula con los días asistidos del mes sobre los días laborables (lunes a viernes).</p>
+<form class="filtros" method="post" action="{{ url_for('rrhh.nomina_generar') }}">
+  <label>Mes a calcular <input type="month" name="periodo" value="{{ periodo_sugerido }}" required></label>
+  <button class="btn">Generar nómina</button>
+</form>
+{% call(n) tabla([('Periodo','periodo'),('Generada','generada'),('Haberes','total_haberes'),('Descuentos','total_descuentos'),('Neto','total_neto'),('Estado','estado')], nominas, 'Todavía no se generó ninguna nómina.') %}
+  <a class="btn sec chico" href="{{ url_for('rrhh.nomina_detalle', id=n.id_nomina) }}">Ver detalle</a>
+{% endcall %}
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "rrhh/base.html" %}
+{% block titulo %}{{ 'Editar' if id else 'Nuevo' }} empleado{% endblock %}
+{% block contenido %}
+<a href="{{ url_for('rrhh.personal') }}">Volver a personal</a>
+<h1>{{ 'Editar empleado' if id else 'Nuevo empleado' }}</h1>
+<form class="campos" method="post">
+  <label>Nombres <input name="nombres" value="{{ e.nombres or '' }}" required></label>
+  <label>Apellidos <input name="apellidos" value="{{ e.apellidos or '' }}" required></label>
+  <label>CI <input name="ci" value="{{ e.ci or '' }}"></label>
+  <label>Fecha de nacimiento <input type="date" name="fecha_nacimiento" value="{{ e.fecha_nacimiento or '' }}"></label>
+  <label>Teléfono <input name="telefono" value="{{ e.telefono or '' }}"></label>
+  <label>Correo <input type="email" name="email" value="{{ e.email or '' }}"></label>
+  <label>Cargo
+    <select name="id_cargo" required>
+      <option value="">Elige un cargo</option>
+      {% for c in cargos %}<option value="{{ c.id_cargo }}" {{ 'selected' if c.id_cargo == e.id_cargo }}>{{ c.nombre }} (Bs {{ c.salario_base }})</option>{% endfor %}
+    </select>
+  </label>
+  <label>Fecha de ingreso <input type="date" name="fecha_ingreso" value="{{ e.fecha_ingreso or '' }}"></label>
+  <label class="ancho">Dirección <input name="direccion" value="{{ e.direccion or '' }}"></label>
+  <div><button class="btn">Guardar empleado</button></div>
+</form>
+{% endblock %}

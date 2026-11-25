@@ -1,0 +1,15 @@
+{% extends "vendedor/base.html" %}
+{% from "vendedor/macros.html" import tabla, estado %}
+{% block titulo %}Pedido {{ p.numero_pedido }}{% endblock %}
+{% block contenido %}
+<a href="{{ url_for('ventas.pedidos') }}">Volver a pedidos</a>
+<div class="barra"><h1>Pedido {{ p.numero_pedido }}</h1>{{ estado(p.estado) }}</div>
+<dl class="ficha">
+  <div><dt>Cliente</dt><dd>{{ p.cliente }}</dd></div>
+  <div><dt>Origen</dt><dd>{{ p.origen }}</dd></div>
+  <div><dt>Entrega estimada</dt><dd>{{ p.fecha_entrega_estimada or '—' }}</dd></div>
+  <div><dt>Factura</dt><dd>{% if p.id_factura %}<a href="{{ url_for('ventas.factura_detalle', id=p.id_factura) }}">{{ p.numero_factura }}</a>{% else %}Sin emitir{% endif %}</dd></div>
+</dl>
+{{ tabla([('Código','codigo'),('Producto','producto'),('Cantidad','cantidad'),('Precio','precio_unitario'),('Subtotal','subtotal')], lineas) }}
+<p class="total">Subtotal Bs {{ p.subtotal }} · IVA Bs {{ p.impuestos }} · Total Bs {{ p.total }}</p>
+{% endblock %}
