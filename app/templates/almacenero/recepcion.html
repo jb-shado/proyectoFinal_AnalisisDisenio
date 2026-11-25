@@ -1,0 +1,38 @@
+{% extends "almacenero/base.html" %}
+{% from "almacenero/macros.html" import tabla %}
+{% block titulo %}Recepción de insumos{% endblock %}
+{% block contenido %}
+<h1>Recepción de insumos</h1>
+<p class="sub">Registra lo que llega del proveedor contra su orden de compra. Al guardar se crea el lote con su vencimiento y el inventario se actualiza solo.</p>
+
+{% if pendientes %}
+<form class="campos" method="post">
+  <label class="ancho">Orden de compra e insumo <span class="regla">RN-05</span>
+    <select name="linea" required>
+      <option value="">Elige lo que estás recibiendo</option>
+      {% for p in pendientes %}
+      <option value="{{ p.clave }}" {{ 'selected' if form.get('linea') == p.clave }}>
+        {{ p.numero_orden }} · {{ p.insumo }} · faltan {{ '%g'|format(p.pendiente) }} {{ p.unidad }} · {{ p.proveedor }}{{ ' · perecedero' if p.perecedero }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Número de lote <span class="regla">RN-06</span>
+    <input name="numero_lote" required maxlength="50" placeholder="LI-2026-052" value="{{ form.get('numero_lote','') }}"></label>
+  <label>Fecha de vencimiento
+    <input type="date" name="fecha_vencimiento" min="{{ hoy }}" value="{{ form.get('fecha_vencimiento','') }}"></label>
+  <label>Cantidad recibida
+    <input type="number" name="cantidad" min="0.001" step="0.001" required value="{{ form.get('cantidad','') }}"></label>
+  <label class="ancho">Observación
+    <textarea name="observacion" placeholder="Estado del empaque, temperatura de llegada, faltantes...">{{ form.get('observacion','') }}</textarea></label>
+  <div><button class="btn">Registrar recepción</button></div>
+</form>
+{% else %}<p class="vacio">No hay órdenes de compra emitidas pendientes de recibir.</p>{% endif %}
+
+<h2>Pendiente de recibir</h2>
+{{ tabla([('Orden','numero_orden'),('Proveedor','proveedor'),('Insumo','insumo'),('Pedido','pedido'),('Recibido','recibido'),('Falta','pendiente'),('Unidad','unidad'),('Entrega esperada','entrega')],
+         pendientes, 'Nada pendiente.') }}
+
+<h2>Recepciones registradas</h2>
+{{ tabla([('Fecha','fecha'),('Orden','numero_orden'),('Proveedor','proveedor'),('Insumo','insumo'),('Lote','numero_lote'),('Vence','fecha_vencimiento'),('Cantidad','cantidad'),('Unidad','unidad'),('Recibió','responsable')],
+         recepciones, 'Aún no hay recepciones.') }}
+{% endblock %}

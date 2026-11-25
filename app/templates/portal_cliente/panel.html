@@ -1,0 +1,20 @@
+{% extends "portal_cliente/base.html" %}
+{% from "portal_cliente/macros.html" import kpi, atajos, tabla %}
+{% block titulo %}Inicio{% endblock %}
+{% block contenido %}
+<h1>Hola, {{ cliente.nombre_contacto or cliente.razon_social }}</h1>
+<p class="sub">{{ cliente.razon_social }} · NIT {{ cliente.nit_ci }}. Aquí ves tus pedidos recientes y lo que tienes por pagar.</p>
+<div class="kpis">
+  {{ kpi(kpis.pendientes, 'Pedidos esperando confirmación', true) }}
+  {{ kpi(kpis.en_curso, 'Pedidos en curso') }}
+  {{ kpi('Bs %.2f'|format(kpis.saldo), 'Saldo pendiente', kpis.saldo > 0) }}
+  {{ kpi(kpis.reclamos, 'Reclamos en atención') }}
+</div>
+{{ atajos(menu) }}
+
+<h2>Pedidos recientes</h2>
+{% call(p) tabla([('Pedido','numero_pedido'),('Fecha','fecha_pedido'),('Entrega estimada','fecha_entrega_estimada'),('Total Bs','total_bs'),('Estado','estado')],
+                 recientes, 'Todavía no hiciste pedidos.') %}
+  <a class="btn sec chico" href="{{ url_for('cliente.pedido_detalle', id=p.id_pedido) }}">Ver</a>
+{% endcall %}
+{% endblock %}

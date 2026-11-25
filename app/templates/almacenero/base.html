@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Inicio{% endblock %} · ERP Alimentos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+  <style>
+    /* estilos propios del módulo (no tocan app.css del equipo) */
+    .e-vencido,.e-critico,.e-reponer{background:var(--rojo-bg);color:var(--rojo)}
+    .e-ok,.e-recepcion{background:var(--verde-100);color:var(--verde-900)}
+    .e-sin-vencimiento,.e-baja,.e-ajuste{background:#e8e6e0;color:var(--tinta-2)}
+    .e-despacho,.e-en-proceso{background:var(--ambar-bg);color:var(--ambar)}
+    tr.fila-vencido td{background:#fdf3f1} tr.fila-critico td{background:#fff8ea}
+    .nota{font-size:.88rem;color:var(--tinta-2)}
+    .regla{display:inline-block;font-size:.75rem;font-weight:600;color:var(--verde-700);border:1px solid var(--verde-700);border-radius:99px;padding:0 .5rem;margin-left:.35rem;vertical-align:middle}
+    .pasos{counter-reset:p;list-style:none;padding:0;margin:0 0 1rem}
+    .aviso.info{background:var(--ambar-bg);border-color:var(--ambar);color:var(--ambar)}
+  </style>
+</head>
+<body>
+{% if menu is defined %}
+<aside class="lateral">
+  <a class="marca" href="/">ERP Alimentos</a>
+  <p class="rol">Rol: {{ rol }}</p>
+  <nav aria-label="Pantallas del rol">
+    {% for etiqueta, ep, sub in menu %}
+      {% set u = url_for(ep) %}
+      {% set activo = (request.path == u) if loop.first else (request.path == u or request.path.startswith(u ~ '/')) %}
+      <a href="{{ u }}" class="{{ 'activo' if activo }}"{% if activo %} aria-current="page"{% endif %}>{{ etiqueta }}<small>{{ sub }}</small></a>
+    {% endfor %}
+  </nav>
+</aside>
+{% endif %}
+<main class="contenido {{ 'solo' if menu is not defined }}">
+  {% for categoria, mensaje in get_flashed_messages(with_categories=true) %}
+    <div class="aviso {{ categoria }}" role="status">{{ mensaje }}</div>
+  {% endfor %}
+  {% block contenido %}{% endblock %}
+</main>
+</body>
+</html>

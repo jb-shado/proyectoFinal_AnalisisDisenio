@@ -1,0 +1,20 @@
+{% extends "portal_cliente/base.html" %}
+{% from "portal_cliente/macros.html" import tabla %}
+{% block titulo %}Mis pedidos{% endblock %}
+{% block contenido %}
+<div class="barra"><h1>Mis pedidos</h1><a class="btn" href="{{ url_for('cliente.pedido_nuevo') }}">Nuevo pedido</a></div>
+<p class="sub">Estado de cada pedido: pendiente → confirmado → despachado → entregado.</p>
+<form class="filtros" method="get">
+  <label>Estado
+    <select name="estado" onchange="this.form.submit()">
+      {% for v, t in [('', 'Todos'), ('pendiente','Pendientes'), ('confirmado','Confirmados'), ('despachado','Despachados'), ('entregado','Entregados'), ('rechazado','Rechazados')] %}
+      <option value="{{ v }}" {{ 'selected' if v == estado }}>{{ t }}</option>{% endfor %}
+    </select>
+  </label>
+  <noscript><button class="btn sec">Filtrar</button></noscript>
+</form>
+{% call(p) tabla([('Pedido','numero_pedido'),('Fecha','fecha_pedido'),('Productos','items'),('Total Bs','total_bs'),('Factura','numero_factura'),('Estado','estado')],
+                 pedidos, 'No hay pedidos con este filtro.') %}
+  <a class="btn sec chico" href="{{ url_for('cliente.pedido_detalle', id=p.id_pedido) }}">Ver detalle</a>
+{% endcall %}
+{% endblock %}

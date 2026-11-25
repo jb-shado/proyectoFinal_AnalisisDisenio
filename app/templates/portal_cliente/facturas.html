@@ -1,0 +1,31 @@
+{% extends "portal_cliente/base.html" %}
+{% from "portal_cliente/macros.html" import tabla, estado, kpi %}
+{% block titulo %}Facturas y saldos{% endblock %}
+{% block contenido %}
+<h1>Facturas y saldos</h1>
+<p class="sub">Tus facturas, el estado de cada despacho y lo que queda por pagar.</p>
+<div class="kpis">
+  {{ kpi('Bs %.2f'|format(saldo), 'Saldo pendiente total', saldo > 0) }}
+  {{ kpi('Bs %.2f'|format(limite), 'Límite de crédito') }}
+  {{ kpi('Bs %.2f'|format([limite - saldo, 0]|max), 'Crédito disponible') }}
+</div>
+{% if facturas %}
+<div class="tabla-wrap"><table>
+  <thead><tr><th>Factura</th><th>Emisión</th><th>Pedido</th><th class="num">Total Bs</th><th class="num">Saldo Bs</th><th>Vence pago</th><th>Estado</th><th>Nota de despacho</th><th>Transportista</th></tr></thead>
+  <tbody>{% for f in facturas %}<tr>
+    <td>{{ f.numero_factura }}</td><td>{{ f.fecha_emision }}</td>
+    <td><a href="{{ url_for('cliente.pedido_detalle', id=f.id_pedido) }}">{{ f.numero_pedido }}</a></td>
+    <td class="num">{{ '%.2f'|format(f.total) }}</td>
+    <td class="num {{ 'sin-stock' if f.vencida }}">{{ '%.2f'|format(f.saldo_pendiente) }}</td>
+    <td>{{ f.vence_pago if f.saldo_pendiente > 0 else '—' }}{% if f.vencida %} <small class="sin-stock">vencida</small>{% endif %}</td>
+    <td>{{ estado(f.estado) }}</td>
+    <td>{% if f.numero_nota %}{{ f.numero_nota }} {{ estado(f.despacho) }}{% else %}Sin despacho{% endif %}</td>
+    <td>{{ f.transportista or '—' }}</td>
+  </tr>{% endfor %}</tbody>
+</table></div>
+{% else %}<p class="vacio">Todavía no tienes facturas.</p>{% endif %}
+
+<h2>Pagos registrados</h2>
+{{ tabla([('Fecha','fecha'),('Factura','numero_factura'),('Monto Bs','monto_bs'),('Método','metodo_pago'),('Referencia','referencia')], pagos, 'Aún no hay pagos registrados.') }}
+<p class="nota">Los pagos los registra tu vendedor al recibirlos.</p>
+{% endblock %}

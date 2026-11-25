@@ -1,0 +1,26 @@
+{% extends "portal_cliente/base.html" %}
+{% from "portal_cliente/macros.html" import tabla %}
+{% block titulo %}Reclamos{% endblock %}
+{% block contenido %}
+<h1>Reclamos</h1>
+<p class="sub">Si un producto llegó en mal estado, regístralo indicando el lote que recibiste. Con ese lote la empresa rastrea el origen del problema. <span class="regla">RN-21</span></p>
+
+<h2>Nuevo reclamo</h2>
+{% if lotes %}
+<form class="campos" method="post">
+  <label class="ancho">Lote recibido
+    <select name="lote" required>
+      <option value="">Elige el lote (está impreso en el envase)</option>
+      {% for l in lotes %}<option value="{{ l.clave }}" {{ 'selected' if form.get('lote') == l.clave }}>{{ l.numero_lote }} · {{ l.producto }} · factura {{ l.numero_factura or '—' }} · {{ l.cantidad }} unid.</option>{% endfor %}
+    </select>
+  </label>
+  <label class="ancho">Qué pasó
+    <textarea name="descripcion" required minlength="10" placeholder="Ej.: 4 unidades llegaron con el envase inflado">{{ form.get('descripcion','') }}</textarea></label>
+  <div><button class="btn">Registrar reclamo</button></div>
+</form>
+{% else %}<p class="vacio">Aún no recibiste productos; cuando tengas un despacho podrás reclamar sobre sus lotes.</p>{% endif %}
+
+<h2>Mis reclamos</h2>
+{{ tabla([('Reclamo','numero_reclamo'),('Fecha','fecha'),('Producto','producto'),('Lote','numero_lote'),('Factura','numero_factura'),('Estado','estado'),('Respuesta','resolucion')],
+         reclamos, 'No tienes reclamos registrados.') }}
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "portal_cliente/base.html" %}
+{% from "portal_cliente/macros.html" import tabla, estado %}
+{% block titulo %}Pedido {{ p.numero_pedido }}{% endblock %}
+{% block contenido %}
+<a href="{{ url_for('cliente.pedidos') }}">Volver a mis pedidos</a>
+<div class="barra"><h1>Pedido {{ p.numero_pedido }}</h1>{{ estado(p.estado) }}</div>
+
+{% if p.estado == 'rechazado' %}
+<div class="aviso error" role="status">Tu vendedor rechazó este pedido{% if p.observacion %}: {{ p.observacion }}{% endif %}.</div>
+{% else %}
+<ol class="linea-tiempo" aria-label="Avance del pedido">
+  {% for paso in pasos %}<li class="{{ 'actual' if loop.index0 == actual else ('hecho' if loop.index0 < actual) }}">{{ paso|capitalize }}</li>{% endfor %}
+</ol>
+{% if p.estado == 'pendiente' %}<p class="nota">Tu vendedor revisará el stock y confirmará el pedido.</p>{% endif %}
+{% endif %}
+
+<dl class="ficha">
+  <div><dt>Fecha del pedido</dt><dd>{{ p.fecha_pedido }}</dd></div>
+  <div><dt>Entrega estimada</dt><dd>{{ p.fecha_entrega_estimada or '—' }}</dd></div>
+  <div><dt>Hecho desde</dt><dd>{{ 'Portal' if p.origen == 'portal' else 'Vendedor' }}</dd></div>
+  <div><dt>Factura</dt><dd>{{ factura.numero_factura if factura else 'Aún no emitida' }}</dd></div>
+  <div><dt>Despacho</dt><dd>{% if factura and factura.numero_nota %}{{ factura.numero_nota }} {{ estado(factura.despacho) }}{% else %}—{% endif %}</dd></div>
+</dl>
+
+<h2>Productos</h2>
+{{ tabla([('Código','codigo'),('Producto','producto'),('Cantidad','cantidad'),('Precio Bs','precio_bs'),('Subtotal Bs','subtotal_bs')], lineas) }}
+<p class="total">Subtotal Bs {{ p.subtotal_bs }} · IVA Bs {{ p.impuestos_bs }} · Total Bs {{ p.total_bs }}</p>
+
+{% if lotes %}
+<h2>Lotes que recibiste</h2>
+<p class="nota">Si tienes un problema con un producto, usa este número de lote para registrar tu reclamo.</p>
+{{ tabla([('Producto','producto'),('Lote','numero_lote'),('Cantidad','cantidad'),('Vence','fecha_vencimiento')], lotes) }}
+<p><a class="btn sec" href="{{ url_for('cliente.reclamos') }}">Registrar un reclamo</a></p>
+{% endif %}
+{% endblock %}
