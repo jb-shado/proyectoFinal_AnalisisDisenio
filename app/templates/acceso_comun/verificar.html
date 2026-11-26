@@ -1,0 +1,15 @@
+{% extends "acceso_comun/base.html" %}
+{% block titulo %}Verificación{% endblock %}
+{% block contenido %}
+<div class="acceso">
+  <h1>Verificación</h1>
+  <p class="sub">Escribe el código que recibiste y elige tu nueva contraseña.</p>
+  <form method="post">
+    <label>Código de verificación <input name="codigo" inputmode="numeric" maxlength="6" autocomplete="one-time-code" required autofocus></label>
+    <label>Nueva contraseña <input type="password" name="clave" autocomplete="new-password" required></label>
+    <label>Repite la contraseña <input type="password" name="repetir" autocomplete="new-password" required></label>
+    <button class="btn">Cambiar contraseña</button>
+  </form>
+  <p class="enlaces"><a href="{{ url_for('/.login') }}">Volver a iniciar sesión</a></p>
+</div>
+{% endblock %}

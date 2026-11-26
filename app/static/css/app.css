@@ -87,3 +87,30 @@ form.en-linea{display:inline-flex;gap:.4rem;align-items:center}
 }
 @media (prefers-reduced-motion:no-preference){.btn,.atajos a,.lateral nav a{transition:background .15s}}
 .sr{position:absolute;left:-9999px}
+
+/* ===== Agregados para jefe de producción, contador y acceso común ===== */
+.e-planificada,.e-registrado{background:#e8e6e0;color:var(--tinta-2)}
+.e-en-proceso,.e-parcial{background:var(--ambar-bg);color:var(--ambar)}
+.e-completada,.e-completado{background:var(--verde-100);color:var(--verde-900)}
+.e-cancelada{background:var(--rojo-bg);color:var(--rojo)}
+.falta{color:var(--rojo);font-weight:600}
+.progreso{display:inline-block;width:90px;height:8px;background:#e8e6e0;border-radius:99px;vertical-align:middle;margin-right:.5rem;overflow:hidden}
+.progreso i{display:block;height:100%;background:var(--verde-700)}
+.etiqueta-lote{border:2px solid var(--tinta);border-radius:var(--radio);padding:1.25rem;max-width:360px;background:#fff}
+.etiqueta-lote h2{margin:0 0 .5rem}
+.etiqueta-lote dl{display:grid;grid-template-columns:auto 1fr;gap:.2rem 1rem;margin:0}
+.etiqueta-lote dt{color:var(--tinta-2);font-size:.85rem} .etiqueta-lote dd{margin:0;font-weight:600}
+.codigo-barras{height:46px;margin-top:1rem;background:repeating-linear-gradient(90deg,var(--tinta) 0 2px,#fff 2px 4px,var(--tinta) 4px 5px,#fff 5px 8px)}
+.dos-col{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.5rem;align-items:start}
+.subtotal td{font-weight:700;background:var(--arena)}
+/* inicio de sesión y menú */
+.acceso{max-width:420px;margin:8vh auto;width:100%}
+.acceso h1{font-size:1.9rem}
+.acceso form{display:grid;gap:1rem;margin-top:1.5rem}
+.acceso .btn{width:100%;text-align:center}
+.acceso .enlaces{margin-top:1rem;font-size:.92rem}
+.modulos{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:.75rem;margin-top:1.5rem}
+.modulos a{background:var(--verde-100);border:1px solid var(--verde-700);border-radius:var(--radio);padding:1.1rem;text-decoration:none;color:var(--verde-900);display:flex;flex-direction:column}
+.modulos a span{color:var(--verde-700);font-size:.9rem}
+.modulos a:hover{background:#cfeade}
+@media print{.lateral,.no-imprimir,.aviso{display:none}.contenido{padding:0}}

@@ -1,0 +1,11 @@
+{% extends "jefe_produccion/base.html" %}
+{% from "jefe_produccion/macros.html" import tabla %}
+{% block titulo %}Recetas{% endblock %}
+{% block contenido %}
+<div class="barra"><div><h1>Recetas</h1><p class="sub">Cada cambio crea una versión nueva. Solo la versión vigente se usa en órdenes.</p></div>
+<a class="btn" href="{{ url_for('jefe.receta_nueva') }}">Nueva receta</a></div>
+{% call(r) tabla([('Producto','producto'),('Versión','version'),('Descripción','descripcion'),('Rendimiento','rendimiento'),('Creada','fecha'),('Estado','estado')],
+                 recetas, 'Todavía no hay recetas.') %}
+  <a class="btn sec chico" href="{{ url_for('jefe.receta_detalle', id=r.id_receta) }}">Ver</a>
+{% endcall %}
+{% endblock %}

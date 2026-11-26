@@ -1,0 +1,29 @@
+{% macro kpi(valor, etiqueta, alerta=false) %}
+<div class="kpi {{ 'alerta' if alerta and valor }}"><strong>{{ valor }}</strong><span>{{ etiqueta }}</span></div>
+{% endmacro %}
+
+{% macro atajos(menu) %}
+<div class="atajos">
+  {% for etiqueta, ep, sub in menu[1:] %}<a href="{{ url_for(ep) }}"><b>{{ etiqueta }}</b><span>{{ sub }}</span></a>{% endfor %}
+</div>
+{% endmacro %}
+
+{% macro estado(v) %}<span class="estado e-{{ v|string|replace('_','-')|lower }}">{{ v|string|replace('_',' ') }}</span>{% endmacro %}
+
+{# columnas = [(titulo, clave)] ; usa {% call(f) tabla(...) %} para añadir acciones #}
+{% macro tabla(columnas, filas, vacio='Todavía no hay registros.') %}
+{% if filas %}
+<div class="tabla-wrap"><table>
+  <thead><tr>{% for t, k in columnas %}<th>{{ t }}</th>{% endfor %}{% if caller %}<th><span class="sr">Acciones</span></th>{% endif %}</tr></thead>
+  <tbody>
+  {% for f in filas %}<tr>
+    {% for t, k in columnas %}<td>
+      {% if k in ('estado','resultado','ultimo_control','despacho') and f[k] %}{{ estado(f[k]) }}
+      {% elif f[k] is none %}—{% else %}{{ f[k] }}{% endif %}
+    </td>{% endfor %}
+    {% if caller %}<td class="acc">{{ caller(f) }}</td>{% endif %}
+  </tr>{% endfor %}
+  </tbody>
+</table></div>
+{% else %}<p class="vacio">{{ vacio }}</p>{% endif %}
+{% endmacro %}

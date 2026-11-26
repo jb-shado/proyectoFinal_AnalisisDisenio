@@ -1,0 +1,16 @@
+{% extends "jefe_produccion/base.html" %}
+{% from "jefe_produccion/macros.html" import kpi, atajos, tabla %}
+{% block titulo %}Panel de producción{% endblock %}
+{% block contenido %}
+<h1>Producción</h1>
+<p class="sub">Órdenes en curso, insumos por reponer y accesos del rol.</p>
+<div class="kpis">
+  {{ kpi(kpis.en_proceso|default(0), 'Órdenes en proceso') }}
+  {{ kpi(kpis.planificadas|default(0), 'Órdenes planificadas') }}
+  {{ kpi(kpis.por_reponer|default(0), 'Insumos bajo el mínimo', true) }}
+  {{ kpi(kpis.rendimiento|default('—'), 'Rendimiento promedio') }}
+</div>
+{{ atajos(menu) }}
+<h2>Órdenes recientes</h2>
+{{ tabla([('Orden','numero_orden'),('Receta','receta'),('Planificado','cantidad_planificada'),('Inicio','fecha'),('Estado','estado')], recientes, 'Aún no hay órdenes.') }}
+{% endblock %}

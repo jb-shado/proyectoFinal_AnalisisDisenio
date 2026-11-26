@@ -1,0 +1,26 @@
+{% extends "jefe_produccion/base.html" %}
+{% from "jefe_produccion/macros.html" import tabla %}
+{% block titulo %}Consumo de insumos{% endblock %}
+{% block contenido %}
+<h1>Consumo de insumos</h1>
+<p class="sub">Al confirmar, las cantidades se descuentan del inventario. No puedes consumir más de lo que hay.</p>
+{% for o in pendientes %}
+<section class="tarjeta">
+  <header><strong>{{ o.numero_orden }} · {{ o.receta }}</strong><span>{{ o.cantidad_planificada }} unidades</span></header>
+  <form method="post" action="{{ url_for('jefe.consumo_registrar', id=o.id_orden_produccion) }}">
+    <div class="tabla-wrap"><table>
+      <thead><tr><th>Insumo</th><th class="num">Planificado</th><th class="num">Disponible</th><th class="num">Consumo real</th></tr></thead>
+      <tbody>{% for x in o.lineas %}<tr>
+        <td>{{ x.insumo }}</td><td class="num">{{ x.requerido }} {{ x.unidad }}</td>
+        <td class="num {{ 'sin-stock' if not x.suficiente }}">{{ x.disponible }} {{ x.unidad }}</td>
+        <td class="num"><input class="corto" type="number" step="0.001" min="0" max="{{ x.disponible }}" name="real_{{ x.id_insumo }}"
+             value="{{ x.requerido if x.suficiente else x.disponible }}" aria-label="Consumo real de {{ x.insumo }}"></td>
+      </tr>{% endfor %}</tbody>
+    </table></div>
+    <p><button class="btn">Confirmar y descontar inventario</button></p>
+  </form>
+</section>
+{% else %}<p class="vacio">No hay órdenes en proceso esperando consumo.</p>{% endfor %}
+<h2>Consumos registrados</h2>
+{{ tabla([('Fecha','fecha'),('Orden','numero_orden'),('Insumo','insumo'),('Cantidad','cantidad')], historial, 'Aún no se registró consumo.') }}
+{% endblock %}

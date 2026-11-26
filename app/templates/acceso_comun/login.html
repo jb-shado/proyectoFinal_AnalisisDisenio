@@ -1,0 +1,14 @@
+{% extends "acceso_comun/base.html" %}
+{% block titulo %}Iniciar sesión{% endblock %}
+{% block contenido %}
+<div class="acceso">
+  <h1>ERP Alimentos</h1>
+  <p class="sub">Ingresa con tu usuario para ver los módulos de tu rol.</p>
+  <form method="post">
+    <label>Usuario <input name="usuario" autocomplete="username" required autofocus></label>
+    <label>Contraseña <input type="password" name="clave" autocomplete="current-password" required></label>
+    <button class="btn">Ingresar</button>
+  </form>
+  <p class="enlaces"><a href="{{ url_for('/.recuperar') }}">¿Olvidaste tu contraseña?</a></p>
+</div>
+{% endblock %}

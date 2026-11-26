@@ -1,0 +1,36 @@
+{% extends "jefe_produccion/base.html" %}
+{% from "jefe_produccion/macros.html" import tabla %}
+{% block titulo %}Mermas y rendimiento{% endblock %}
+{% block contenido %}
+<h1>Mermas y rendimiento</h1>
+<p class="sub">Rendimiento = producido ÷ planificado. Registra cada merma con su causa.</p>
+<h2>Rendimiento por orden</h2>
+{% if resumen %}
+<div class="tabla-wrap"><table>
+  <thead><tr><th>Orden</th><th>Producto</th><th class="num">Planificado</th><th class="num">Producido</th><th class="num">Merma de insumos</th><th>Rendimiento</th></tr></thead>
+  <tbody>{% for o in resumen %}<tr>
+    <td>{{ o.numero_orden }}</td><td>{{ o.producto }}</td><td class="num">{{ o.cantidad_planificada }}</td>
+    <td class="num">{{ o.cantidad_producida }}</td><td class="num">{{ o.merma_total }}</td>
+    <td>{% if o.rendimiento is not none %}<span class="progreso"><i style="width:{{ [o.rendimiento,100]|min }}%"></i></span>{{ o.rendimiento }} %{% else %}<span class="estado e-en-proceso">En proceso</span>{% endif %}</td>
+  </tr>{% endfor %}</tbody>
+</table></div>
+{% else %}<p class="vacio">Aún no hay órdenes en curso.</p>{% endif %}
+<h2>Registrar merma</h2>
+<form method="post" class="campos">
+  <label>Orden
+    <select name="id_orden" required><option value="">Elige una orden</option>
+      {% for o in ordenes %}<option value="{{ o.id_orden_produccion }}">{{ o.numero_orden }} · {{ o.producto }}</option>{% endfor %}
+    </select></label>
+  <label>Tipo
+    <select name="tipo"><option>Proceso</option><option>Calidad</option><option>Vencimiento</option><option>Otro</option></select></label>
+  <label>Insumo
+    <select name="id_insumo"><option value="">No aplica</option>
+      {% for i in insumos %}<option value="{{ i.id_insumo }}">{{ i.nombre }}</option>{% endfor %}
+    </select></label>
+  <label>Cantidad <input type="number" name="cantidad" min="0.001" step="0.001" required></label>
+  <label class="ancho">Causa <input name="causa" maxlength="255"></label>
+  <div><button class="btn">Registrar merma</button></div>
+</form>
+<h2>Mermas registradas</h2>
+{{ tabla([('Fecha','fecha'),('Orden','orden'),('Tipo','tipo_merma'),('Insumo','insumo'),('Cantidad','cantidad'),('Causa','causa')], detalle, 'Aún no hay mermas registradas.') }}
+{% endblock %}

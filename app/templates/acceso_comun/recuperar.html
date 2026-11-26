@@ -1,0 +1,13 @@
+{% extends "acceso_comun/base.html" %}
+{% block titulo %}Recuperar contraseña{% endblock %}
+{% block contenido %}
+<div class="acceso">
+  <h1>Recuperar contraseña</h1>
+  <p class="sub">Escribe tu usuario y te enviaremos un código de verificación.</p>
+  <form method="post">
+    <label>Usuario <input name="usuario" required autofocus></label>
+    <button class="btn">Enviar código</button>
+  </form>
+  <p class="enlaces"><a href="{{ url_for('/.login') }}">Volver a iniciar sesión</a></p>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "jefe_produccion/base.html" %}
+{% from "jefe_produccion/macros.html" import tabla %}
+{% block titulo %}Nueva orden{% endblock %}
+{% block contenido %}
+<a href="{{ url_for('jefe.ordenes') }}">Volver a órdenes</a>
+<h1>Nueva orden de producción</h1>
+<p class="sub">Primero verifica los insumos. La orden solo se crea si alcanza el stock.</p>
+<form method="get" class="campos">
+  <label>Receta vigente
+    <select name="id_receta" required>
+      <option value="">Elige una receta</option>
+      {% for r in recetas %}<option value="{{ r.id_receta }}" {{ 'selected' if r.id_receta == id_receta }}>{{ r.nombre }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>Cantidad a producir <input type="number" name="cantidad" min="1" value="{{ cantidad or '' }}" required></label>
+  <div><button class="btn sec">Verificar insumos</button></div>
+</form>
+{% if requerimiento %}
+<h2>Verificación de insumos</h2>
+<div class="tabla-wrap"><table>
+  <thead><tr><th>Insumo</th><th class="num">Requerido</th><th class="num">Disponible</th><th>Estado</th></tr></thead>
+  <tbody>{% for x in requerimiento %}<tr>
+    <td>{{ x.insumo }}</td><td class="num">{{ x.requerido }} {{ x.unidad }}</td>
+    <td class="num {{ 'sin-stock' if not x.suficiente }}">{{ x.disponible }} {{ x.unidad }}</td>
+    <td>{% if x.suficiente %}<span class="estado e-disponible">Suficiente</span>{% else %}<span class="estado e-agotado">Faltan {{ x.falta }} {{ x.unidad }}</span>{% endif %}</td>
+  </tr>{% endfor %}</tbody>
+</table></div>
+<form method="post" class="campos" style="margin-top:1rem">
+  <input type="hidden" name="id_receta" value="{{ id_receta }}"><input type="hidden" name="cantidad" value="{{ cantidad }}">
+  <label>Fecha de inicio <input type="date" name="fecha" min="{{ hoy }}" value="{{ hoy }}"></label>
+  <div><button class="btn" {{ 'disabled' if not alcanza }}>Crear orden</button></div>
+</form>
+{% if not alcanza %}<p class="vacio">Pide los insumos faltantes a compras antes de crear la orden.</p>{% endif %}
+{% endif %}
+{% endblock %}

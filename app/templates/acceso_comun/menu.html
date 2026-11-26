@@ -1,0 +1,10 @@
+{% extends "acceso_comun/base.html" %}
+{% block titulo %}Menú principal{% endblock %}
+{% block contenido %}
+<div class="barra"><div><h1>Hola, {{ nombre }}</h1><p class="sub">Estos son los módulos disponibles para tu rol.</p></div>
+<a class="btn sec" href="{{ url_for('/.salir') }}">Cerrar sesión</a></div>
+<nav class="modulos" aria-label="Módulos">
+  {% for m in modulos %}<a href="{{ m.url }}"><b>{{ m.titulo }}</b><span>{{ m.sub }}</span></a>
+  {% else %}<p class="vacio">Tu rol todavía no tiene módulos asignados.</p>{% endfor %}
+</nav>
+{% endblock %}

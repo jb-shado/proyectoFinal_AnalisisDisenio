@@ -1,0 +1,16 @@
+{% extends "contador/base.html" %}
+{% from "contador/macros.html" import kpi, atajos, tabla %}
+{% block titulo %}Panel de finanzas{% endblock %}
+{% block contenido %}
+<h1>Finanzas</h1>
+<p class="sub">Pagos a proveedores, asientos y costos del período.</p>
+<div class="kpis">
+  {{ kpi(kpis.por_pagar|default('Bs 0.00'), 'Por pagar a proveedores') }}
+  {{ kpi(kpis.vencidas|default(0), 'Cuentas vencidas', true) }}
+  {{ kpi(kpis.asientos|default(0), 'Asientos registrados') }}
+  {{ kpi(kpis.costo_promedio|default('—'), 'Costo promedio por unidad') }}
+</div>
+{{ atajos(menu) }}
+<h2>Próximos vencimientos</h2>
+{{ tabla([('Proveedor','proveedor'),('Orden de compra','orden_compra'),('Vence','fecha_vencimiento'),('Saldo (Bs)','saldo'),('Estado','estado')], proximas, 'No hay cuentas pendientes.') }}
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "jefe_produccion/base.html" %}
+{% from "jefe_produccion/macros.html" import tabla, estado %}
+{% block titulo %}Receta {{ r.nombre }}{% endblock %}
+{% block contenido %}
+<a href="{{ url_for('jefe.recetas') }}">Volver a recetas</a>
+<div class="barra"><h1>{{ r.nombre }}</h1>{{ estado('vigente' if r.vigente else 'baja') }}</div>
+<dl class="ficha">
+  <div><dt>Descripción</dt><dd>{{ r.descripcion or '—' }}</dd></div>
+  <div><dt>Rinde</dt><dd>{{ r.rendimiento }} unidades por tanda</dd></div>
+  <div><dt>Creada</dt><dd>{{ r.fecha }}</dd></div>
+</dl>
+<h2>Insumos por tanda</h2>
+{{ tabla([('Código','codigo'),('Insumo','insumo'),('Cantidad','cantidad'),('Unidad','unidad')], lineas) }}
+{% endblock %}

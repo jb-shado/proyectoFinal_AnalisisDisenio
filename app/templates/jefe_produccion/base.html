@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Inicio{% endblock %} · ERP Alimentos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+</head>
+<body>
+{% if menu is defined %}
+<aside class="lateral">
+  <a class="marca" href="/">ERP Alimentos</a>
+  <p class="rol">Rol: {{ rol }}</p>
+  <nav aria-label="Pantallas del rol">
+    {% for etiqueta, ep, sub in menu %}
+      {% set u = url_for(ep) %}
+      {% set activo = (request.path == u) if loop.first else (request.path == u or request.path.startswith(u ~ '/')) %}
+      <a href="{{ u }}" class="{{ 'activo' if activo }}"{% if activo %} aria-current="page"{% endif %}>{{ etiqueta }}<small>{{ sub }}</small></a>
+    {% endfor %}
+  </nav>
+</aside>
+{% endif %}
+<main class="contenido {{ 'solo' if menu is not defined }}">
+  {% for categoria, mensaje in get_flashed_messages(with_categories=true) %}
+    <div class="aviso {{ categoria }}" role="status">{{ mensaje }}</div>
+  {% endfor %}
+  {% block contenido %}{% endblock %}
+</main>
+</body>
+</html>

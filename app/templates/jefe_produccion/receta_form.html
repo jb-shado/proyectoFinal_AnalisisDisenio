@@ -1,0 +1,30 @@
+{% extends "jefe_produccion/base.html" %}
+{% block titulo %}Nueva receta{% endblock %}
+{% block contenido %}
+<a href="{{ url_for('jefe.recetas') }}">Volver a recetas</a>
+<h1>Nueva receta</h1>
+<p class="sub">Si el producto ya tiene receta, esta pasa a ser su nueva versión vigente y la anterior queda de baja.</p>
+<form method="post">
+  <div class="campos">
+    <label>Producto
+      <select name="id_producto" required>
+        <option value="">Elige un producto</option>
+        {% for p in productos %}<option value="{{ p.id_producto }}">{{ p.nombre }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>Rendimiento por tanda (unidades) <input type="number" name="rendimiento" min="1" step="1" required></label>
+    <label class="ancho">Descripción <input name="descripcion" maxlength="255"></label>
+  </div>
+  <div class="tabla-wrap"><table>
+    <thead><tr><th>Insumo</th><th>Unidad</th><th class="num">Cantidad por tanda</th></tr></thead>
+    <tbody>
+    {% for i in insumos %}<tr>
+      <td>{{ i.nombre }} <small>({{ i.codigo }})</small></td><td>{{ i.unidad }}</td>
+      <td class="num"><input class="corto" type="number" name="ins_{{ i.id_insumo }}" min="0" step="0.001" value="0"
+           aria-label="Cantidad de {{ i.nombre }}"></td>
+    </tr>{% endfor %}
+    </tbody>
+  </table></div>
+  <p><button class="btn">Guardar receta</button></p>
+</form>
+{% endblock %}

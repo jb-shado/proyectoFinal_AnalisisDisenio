@@ -1,0 +1,27 @@
+{% extends "jefe_produccion/base.html" %}
+{% from "jefe_produccion/macros.html" import tabla %}
+{% block titulo %}Orden de producción{% endblock %}
+{% block contenido %}
+<div class="barra"><div><h1>Orden de producción</h1><p class="sub">Al crear una orden se verifica que haya insumos suficientes.</p></div>
+<a class="btn" href="{{ url_for('jefe.orden_nueva') }}">Nueva orden</a></div>
+<form class="filtros" method="get">
+  <label>Estado
+    <select name="estado" onchange="this.form.submit()">
+      {% for v, t in [('', 'Todas'), ('planificada','Planificadas'), ('en_proceso','En proceso'), ('completada','Completadas')] %}
+      <option value="{{ v }}" {{ 'selected' if v == estado }}>{{ t }}</option>{% endfor %}
+    </select>
+  </label>
+</form>
+{% call(o) tabla([('Orden','numero_orden'),('Receta','receta'),('Planificado','cantidad_planificada'),('Producido','cantidad_producida'),('Inicio','fecha'),('Estado','estado')],
+                 ordenes, 'No hay órdenes con este filtro.') %}
+  {% if o.estado == 'planificada' %}
+    <form class="en-linea" method="post" action="{{ url_for('jefe.orden_iniciar', id=o.id_orden_produccion) }}"><button class="btn chico">Iniciar</button></form>
+  {% elif o.estado == 'en_proceso' and o.consumido %}
+    <form class="en-linea" method="post" action="{{ url_for('jefe.orden_finalizar', id=o.id_orden_produccion) }}">
+      <input class="corto" type="number" name="producida" min="1" placeholder="Producido" required aria-label="Cantidad producida">
+      <button class="btn chico">Finalizar</button></form>
+  {% elif o.estado == 'en_proceso' %}
+    <a class="btn sec chico" href="{{ url_for('jefe.consumo') }}">Registrar consumo</a>
+  {% endif %}
+{% endcall %}
+{% endblock %}

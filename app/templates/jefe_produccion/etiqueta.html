@@ -1,0 +1,18 @@
+{% extends "jefe_produccion/base.html" %}
+{% block titulo %}Etiqueta {{ l.numero_lote }}{% endblock %}
+{% block contenido %}
+<div class="no-imprimir"><a href="{{ url_for('jefe.lotes') }}">Volver a lotes</a>
+<h1>Etiqueta del lote</h1><p class="sub">Revisa los datos y envía a imprimir.</p></div>
+<div class="etiqueta-lote">
+  <h2>{{ o.producto }}</h2>
+  <dl>
+    <dt>Lote</dt><dd>{{ l.numero_lote }}</dd>
+    <dt>Producción</dt><dd>{{ l.fecha_produccion }}</dd>
+    <dt>Vence</dt><dd>{{ l.fecha_vencimiento }}</dd>
+    <dt>Cantidad</dt><dd>{{ l.cantidad }} unidades</dd>
+    <dt>Orden</dt><dd>{{ o.numero_orden }}</dd>
+  </dl>
+  <div class="codigo-barras" role="img" aria-label="Código de barras del lote {{ l.numero_lote }}"></div>
+</div>
+<p class="no-imprimir" style="margin-top:1rem"><button class="btn" onclick="window.print()">Imprimir etiqueta</button></p>
+{% endblock %}

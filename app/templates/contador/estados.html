@@ -1,0 +1,36 @@
+{% extends "contador/base.html" %}
+{% block titulo %}Estados financieros{% endblock %}
+{% macro bloque(titulo, filas, total, nombre_total) %}
+<h2>{{ titulo }}</h2>
+<div class="tabla-wrap"><table><tbody>
+  {% for f in filas %}<tr><td>{{ f.cuenta }}</td><td class="num">{{ f.importe }}</td></tr>
+  {% else %}<tr><td colspan="2">Sin movimientos.</td></tr>{% endfor %}
+  <tr class="subtotal"><td>{{ nombre_total }}</td><td class="num">{{ total }}</td></tr>
+</tbody></table></div>
+{% endmacro %}
+{% block contenido %}
+<div class="barra"><div><h1>Estados financieros</h1><p class="sub">Calculados con todos los asientos registrados. Importes en Bs.</p></div>
+<button class="btn sec no-imprimir" onclick="window.print()">Imprimir</button></div>
+<form class="filtros no-imprimir" method="get">
+  <label>Reporte
+    <select name="reporte" onchange="this.form.submit()">
+      <option value="balance" {{ 'selected' if reporte == 'balance' }}>Balance general</option>
+      <option value="resultados" {{ 'selected' if reporte == 'resultados' }}>Estado de resultados</option>
+    </select>
+  </label>
+</form>
+{% if reporte == 'resultados' %}
+  {{ bloque('Ingresos', ingresos, total_ingresos, 'Total ingresos') }}
+  {{ bloque('Costos', costos, total_costos, 'Total costos') }}
+  <p class="total">Utilidad del período: Bs {{ utilidad }}</p>
+{% else %}
+  <div class="dos-col">
+    <div>{{ bloque('Activos', activos, total_activos, 'Total activos') }}</div>
+    <div>
+      {{ bloque('Pasivos', pasivos, total_pasivos, 'Total pasivos') }}
+      {{ bloque('Patrimonio', patrimonio, utilidad, 'Utilidad del período') }}
+      <p class="total">Pasivo + patrimonio: Bs {{ total_pasivo_patrimonio }}</p>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}

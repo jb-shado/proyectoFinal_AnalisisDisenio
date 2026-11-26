@@ -1,0 +1,15 @@
+{% extends "contador/base.html" %}
+{% from "contador/macros.html" import tabla %}
+{% block titulo %}Costo de producción{% endblock %}
+{% block contenido %}
+<h1>Costo de producción</h1>
+<p class="sub">Costo de insumos, mano de obra y gastos indirectos, por receta y por lote.</p>
+<form class="filtros" method="get">
+  <label>Receta o lote <input name="q" value="{{ buscar }}" placeholder="Ej. Pan de molde o LP-2026-093"></label>
+  <button class="btn sec">Buscar</button>
+</form>
+<h2>Por receta</h2>
+{{ tabla([('Receta','receta'),('Unidades','unidades'),('Costo total (Bs)','total'),('Costo unitario (Bs)','unitario')], resumen, 'No hay costos con este filtro.') }}
+<h2>Por lote</h2>
+{{ tabla([('Lote','lote'),('Orden','numero_orden'),('Receta','receta'),('Unidades','unidades'),('Insumos','insumos'),('Mano de obra','mano_obra'),('Indirectos','indirecto'),('Total (Bs)','total'),('Unitario (Bs)','unitario')], lotes, 'No hay lotes con este filtro.') }}
+{% endblock %}

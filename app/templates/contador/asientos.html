@@ -1,0 +1,25 @@
+{% extends "contador/base.html" %}
+{% from "contador/macros.html" import estado %}
+{% block titulo %}Asientos contables{% endblock %}
+{% block contenido %}
+<h1>Asientos contables</h1>
+<p class="sub">Se generan solos con cada compra, producción, venta y pago. Aquí solo los revisas.</p>
+<form class="filtros" method="get">
+  <label>Origen
+    <select name="origen" onchange="this.form.submit()">
+      <option value="">Todos</option>
+      {% for o in origenes %}<option value="{{ o }}" {{ 'selected' if o == origen }}>{{ o|replace('_',' ')|capitalize }}</option>{% endfor %}
+    </select>
+  </label>
+</form>
+{% for a in asientos %}
+<section class="tarjeta">
+  <header><strong>{{ a.numero_asiento }} · {{ a.descripcion }}</strong><span>{{ a.fecha }} · {{ estado(a.estado) }}</span></header>
+  <div class="tabla-wrap"><table>
+    <thead><tr><th>Cuenta</th><th class="num">Debe (Bs)</th><th class="num">Haber (Bs)</th></tr></thead>
+    <tbody>{% for l in a.detalle %}<tr><td>{{ l.cuenta }}</td><td class="num">{{ l.debe }}</td><td class="num">{{ l.haber }}</td></tr>{% endfor %}
+    <tr class="subtotal"><td>Total</td><td class="num">{{ a.total }}</td><td class="num">{{ a.total }}</td></tr></tbody>
+  </table></div>
+</section>
+{% else %}<p class="vacio">No hay asientos con este filtro.</p>{% endfor %}
+{% endblock %}
