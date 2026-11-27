@@ -1,0 +1,63 @@
+{% extends "administrador/base.html" %}
+{% block titulo %}Usuarios{% endblock %}
+{% block contenido %}
+<div class="barra">
+  <div><h1>Usuarios del sistema</h1><p class="sub">Registra, modifica y controla el acceso por rol.</p></div>
+  <a class="btn" href="{{ url_for('admin.usuario_nuevo') }}">Registrar usuario</a>
+</div>
+
+<form class="filtros" method="get">
+  <label>Buscar
+    <input name="q" value="{{ buscar }}" placeholder="Usuario, nombre o correo">
+  </label>
+  <label>Rol
+    <select name="rol">
+      <option value="">Todos los roles</option>
+      {% for item_rol in roles %}
+        <option value="{{ item_rol.id }}" {{ 'selected' if filtro_rol == item_rol.id }}>{{ item_rol.nombre }}{{ ' (inactivo)' if not item_rol.activo }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Estado
+    <select name="estado">
+      <option value="">Todos</option>
+      <option value="activo" {{ 'selected' if estado == 'activo' }}>Activo</option>
+      <option value="inactivo" {{ 'selected' if estado == 'inactivo' }}>Inactivo</option>
+    </select>
+  </label>
+  <button class="btn sec">Filtrar</button>
+</form>
+
+{% if usuarios %}
+<div class="tabla-wrap">
+  <table>
+    <thead>
+      <tr><th>Usuario</th><th>Nombre completo</th><th>Correo</th><th>Rol</th><th>Estado</th><th>Registro</th><th>Acciones</th></tr>
+    </thead>
+    <tbody>
+    {% for usuario in usuarios %}
+      <tr>
+        <td>{{ usuario.nombre_usuario }}</td>
+        <td>{{ usuario.nombre_completo }}</td>
+        <td>{{ usuario.email }}</td>
+        <td>{{ etiquetas_rol[usuario.rol] }}</td>
+        <td><span class="estado {{ 'e-activo' if usuario.activo else 'e-baja' }}">{{ 'Activo' if usuario.activo else 'Inactivo' }}</span></td>
+        <td>{{ usuario.fecha_creacion }}</td>
+        <td class="acc">
+          <a class="btn sec chico" href="{{ url_for('admin.usuario_editar', id_usuario=usuario.id) }}">Editar</a>
+          <form class="en-linea" method="post" action="{{ url_for('admin.usuario_estado', id_usuario=usuario.id) }}">
+            <input type="hidden" name="accion" value="{{ 'desactivar' if usuario.activo else 'activar' }}">
+            <button class="btn {{ 'peligro' if usuario.activo else 'sec' }} chico">
+              {{ 'Desactivar' if usuario.activo else 'Activar' }}
+            </button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="vacio">No se encontraron usuarios con esos filtros.</p>
+{% endif %}
+{% endblock %}

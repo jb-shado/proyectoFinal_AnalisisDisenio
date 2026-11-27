@@ -1,0 +1,31 @@
+{% extends "administrador/base.html" %}
+{% block titulo %}Permisos de {{ rol.nombre }}{% endblock %}
+{% block contenido %}
+<h1>Rol: {{ rol.nombre }}</h1>
+<p class="sub">Modifica la descripción y las capacidades asignadas a este rol.</p>
+<form method="post" class="tarjeta">
+  <div class="campos">
+    <label>Nombre del rol *
+      <input name="nombre" maxlength="50" required value="{{ rol.nombre }}">
+    </label>
+    <label>Descripción
+      <input name="descripcion" maxlength="200" value="{{ rol.descripcion }}">
+    </label>
+  </div>
+  <h2>Permisos</h2>
+  <div class="campos">
+    {% for permiso in permisos %}
+    <label style="flex-direction:row;align-items:center;gap:.5rem">
+      <input type="checkbox" name="permisos" value="{{ permiso.id }}" style="width:auto"
+             {{ 'checked' if permiso.id in seleccionados }}>
+      <span>{{ permiso.nombre }} <small>· {{ permiso.grupo }}</small></span>
+    </label>
+    {% endfor %}
+  </div>
+  {% if rol.id == 'administrador' %}
+  <p class="sub">El rol administrador debe conservar los permisos esenciales de administración.</p>
+  {% endif %}
+  <button class="btn">Guardar cambios</button>
+  <a class="btn sec" href="{{ url_for('admin.roles') }}">Cancelar</a>
+</form>
+{% endblock %}

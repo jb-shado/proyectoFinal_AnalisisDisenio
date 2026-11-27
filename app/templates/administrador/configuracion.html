@@ -1,0 +1,41 @@
+{% extends "administrador/base.html" %}
+{% block titulo %}Configuración general{% endblock %}
+{% block contenido %}
+<h1>Configuración general</h1>
+<p class="sub">Parámetros organizativos y valores generales del sistema.</p>
+<p class="aviso">Los cambios se conservan en memoria durante la ejecución actual. Los límites de sesión requieren conectarse a un módulo de autenticación.</p>
+
+<form method="post" class="campos tarjeta">
+  <label>Nombre de la empresa *
+    <input name="nombre_empresa" maxlength="120" required value="{{ configuracion.nombre_empresa }}">
+  </label>
+  <label>Moneda
+    <select name="moneda">
+      <option value="BOB" {{ 'selected' if configuracion.moneda == 'BOB' }}>BOB · Bolivianos</option>
+      <option value="USD" {{ 'selected' if configuracion.moneda == 'USD' }}>USD · Dólares</option>
+      <option value="EUR" {{ 'selected' if configuracion.moneda == 'EUR' }}>EUR · Euros</option>
+    </select>
+  </label>
+  <label>Zona horaria
+    <select name="zona_horaria">
+      <option value="America/La_Paz" {{ 'selected' if configuracion.zona_horaria == 'America/La_Paz' }}>America/La_Paz</option>
+      <option value="America/Santiago" {{ 'selected' if configuracion.zona_horaria == 'America/Santiago' }}>America/Santiago</option>
+      <option value="UTC" {{ 'selected' if configuracion.zona_horaria == 'UTC' }}>UTC</option>
+    </select>
+  </label>
+  <label>Intentos de acceso permitidos (3–10)
+    <input type="number" name="intentos_maximos" min="3" max="10" required value="{{ configuracion.intentos_maximos }}">
+  </label>
+  <label>Duración de sesión (5–480 minutos)
+    <input type="number" name="duracion_sesion" min="5" max="480" required value="{{ configuracion.duracion_sesion }}">
+  </label>
+  <label style="flex-direction:row;align-items:center;gap:.5rem">
+    <input type="checkbox" name="modo_mantenimiento" value="1" style="width:auto"
+           {{ 'checked' if configuracion.modo_mantenimiento }}>
+    <span>Marcar el sistema en mantenimiento</span>
+  </label>
+  <div class="ancho">
+    <button class="btn">Guardar configuración</button>
+  </div>
+</form>
+{% endblock %}

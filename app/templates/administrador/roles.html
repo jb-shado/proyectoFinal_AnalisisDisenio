@@ -1,0 +1,49 @@
+{% extends "administrador/base.html" %}
+{% block titulo %}Roles y permisos{% endblock %}
+{% block contenido %}
+<div class="barra">
+  <div><h1>Roles y permisos</h1><p class="sub">Define las capacidades que se asignan a cada cuenta.</p></div>
+  <a class="btn" href="{{ url_for('admin.rol_nuevo') }}">Crear rol</a>
+</div>
+<p class="aviso">Los permisos son asignaciones administrativas. La aplicación todavía no tiene autenticación para aplicarlos como restricciones de ruta.</p>
+
+{% if roles %}
+<div class="tabla-wrap">
+  <table>
+    <thead><tr><th>Rol</th><th>Descripción</th><th>Permisos</th><th>Usuarios activos</th><th>Estado</th><th>Acciones</th></tr></thead>
+    <tbody>
+    {% for item_rol in roles %}
+      <tr>
+        <td><strong>{{ item_rol.nombre }}</strong><br><small>{{ item_rol.id }}</small></td>
+        <td>{{ item_rol.descripcion }}</td>
+        <td>
+          {{ item_rol.cantidad_permisos }}
+          {% if item_rol.permisos %}
+          <details><summary>Ver</summary>
+            <ul>{% for permiso_id in item_rol.permisos %}<li>{{ catalogo_permisos.get(permiso_id, permiso_id) }}</li>{% endfor %}</ul>
+          </details>
+          {% endif %}
+        </td>
+        <td class="num">{{ item_rol.usuarios_activos }}</td>
+        <td><span class="estado {{ 'e-activo' if item_rol.activo else 'e-baja' }}">{{ 'Activo' if item_rol.activo else 'Inactivo' }}</span></td>
+        <td class="acc">
+          <a class="btn sec chico" href="{{ url_for('admin.rol_permisos', id_rol=item_rol.id) }}">Permisos</a>
+          {% if item_rol.id != 'administrador' %}
+          <form class="en-linea" method="post" action="{{ url_for('admin.rol_estado', id_rol=item_rol.id) }}">
+            <input type="hidden" name="accion" value="{{ 'desactivar' if item_rol.activo else 'activar' }}">
+            <button class="btn {{ 'peligro' if item_rol.activo else 'sec' }} chico"
+                    {{ 'disabled' if item_rol.activo and item_rol.usuarios_activos }}>
+              {{ 'Desactivar' if item_rol.activo else 'Activar' }}
+            </button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="vacio">No hay roles registrados.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Administración{% endblock %} · ERP Alimentos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+  <style>
+    .campos{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;align-items:end;margin-bottom:1rem}
+  </style>
+</head>
+<body>
+<aside class="lateral">
+  <a class="marca" href="{{ url_for('admin.panel') }}">ERP Alimentos</a>
+  <p class="rol">Rol: {{ rol_sistema }}</p>
+  <nav aria-label="Administración del sistema">
+    {% for etiqueta, ep, sub in menu %}
+      {% set u = url_for(ep) %}
+      {% set activo = request.path == u or request.path.startswith(u ~ '/') %}
+      <a href="{{ u }}" class="{{ 'activo' if activo }}"{% if activo %} aria-current="page"{% endif %}>
+        {{ etiqueta }}<small>{{ sub }}</small>
+      </a>
+    {% endfor %}
+  </nav>
+</aside>
+<main class="contenido">
+  {% for categoria, mensaje in get_flashed_messages(with_categories=true) %}
+    <div class="aviso {{ categoria }}" role="status">{{ mensaje }}</div>
+  {% endfor %}
+  <div class="aviso" role="note">Modo demostración: los cambios administrativos se mantienen solo en memoria hasta reiniciar la aplicación.</div>
+  {% block contenido %}{% endblock %}
+</main>
+</body>
+</html>

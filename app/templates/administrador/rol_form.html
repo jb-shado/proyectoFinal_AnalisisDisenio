@@ -1,0 +1,29 @@
+{% extends "administrador/base.html" %}
+{% block titulo %}Crear rol{% endblock %}
+{% block contenido %}
+<h1>Crear rol</h1>
+<p class="sub">Crea una función del sistema y define sus permisos iniciales.</p>
+<form method="post" class="tarjeta">
+  <div class="campos">
+    <label>Nombre del rol *
+      <input name="nombre" maxlength="50" required value="{{ nombre }}">
+    </label>
+    <label>Descripción
+      <input name="descripcion" maxlength="200" value="{{ descripcion }}">
+    </label>
+  </div>
+  <h2>Permisos iniciales</h2>
+  <div class="campos">
+    {% for permiso in permisos %}
+    <label style="flex-direction:row;align-items:center;gap:.5rem">
+      <input type="checkbox" name="permisos" value="{{ permiso.id }}" style="width:auto"
+             {{ 'checked' if permiso.id in seleccionados }}>
+      <span>{{ permiso.nombre }} <small>· {{ permiso.grupo }}</small></span>
+    </label>
+    {% endfor %}
+  </div>
+  <p class="sub">Asigna al menos un permiso. La aplicación aún no aplica estos permisos mediante autenticación.</p>
+  <button class="btn">Guardar rol</button>
+  <a class="btn sec" href="{{ url_for('admin.roles') }}">Cancelar</a>
+</form>
+{% endblock %}

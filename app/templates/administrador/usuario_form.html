@@ -1,0 +1,32 @@
+{% extends "administrador/base.html" %}
+{% block titulo %}{{ 'Registrar usuario' if nuevo else 'Editar usuario' }}{% endblock %}
+{% block contenido %}
+<h1>{{ 'Registrar usuario' if nuevo else 'Editar usuario' }}</h1>
+<p class="sub">Define la cuenta, el correo y el rol que tendrá acceso al sistema.</p>
+
+<form method="post" class="campos tarjeta">
+  <label>Nombre de usuario *
+    <input name="nombre_usuario" maxlength="50" required value="{{ usuario.get('nombre_usuario', '') }}" autocomplete="username">
+  </label>
+  <label>Nombre completo *
+    <input name="nombre_completo" maxlength="150" required value="{{ usuario.get('nombre_completo', '') }}" autocomplete="name">
+  </label>
+  <label>Correo electrónico *
+    <input type="email" name="email" maxlength="150" required value="{{ usuario.get('email', '') }}" autocomplete="email">
+  </label>
+  <label>Rol *
+    <select name="rol" required>
+      <option value="">Selecciona un rol</option>
+      {% for item_rol in roles %}
+        <option value="{{ item_rol.id }}" {{ 'selected' if usuario.get('rol') == item_rol.id }}>{{ item_rol.nombre }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label class="ancho">Contraseña {{ '*' if nuevo else '(dejar en blanco para conservarla)' }}
+    <input type="password" name="contrasena" minlength="8" {{ 'required' if nuevo }} autocomplete="new-password">
+  </label>
+  <p class="sub ancho">La contraseña se almacena como hash y debe tener al menos 8 caracteres.</p>
+  <button class="btn">{{ 'Crear usuario' if nuevo else 'Guardar cambios' }}</button>
+  <a class="btn sec" href="{{ url_for('admin.usuarios') }}">Cancelar</a>
+</form>
+{% endblock %}
