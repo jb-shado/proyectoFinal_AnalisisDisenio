@@ -1,0 +1,37 @@
+{% extends "gerente/base.html" %}
+{% block titulo %}Supervisión de producción{% endblock %}
+{% block contenido %}
+<h1>Supervisión de producción</h1>
+<p class="sub">Seguimiento de órdenes, cantidades y avance frente al plan.</p>
+
+<section class="kpis" aria-label="Resumen de producción">
+  <div class="kpi"><strong>{{ planificadas }}</strong><span>Unidades planificadas</span></div>
+  <div class="kpi"><strong>{{ producidas }}</strong><span>Unidades producidas</span></div>
+  <div class="kpi"><strong>{{ cumplimiento }}%</strong><span>Cumplimiento total</span></div>
+  <div class="kpi"><strong>{{ en_proceso }}</strong><span>Órdenes en proceso</span></div>
+</section>
+
+<h2>Órdenes de producción</h2>
+<div class="tabla-wrap">
+  <table>
+    <thead><tr><th>Orden</th><th>Producto</th><th>Responsable</th><th class="num">Planificadas</th><th class="num">Producidas</th><th>Avance</th><th>Estado</th></tr></thead>
+    <tbody>
+    {% for orden in ordenes %}
+      <tr>
+        <td>{{ orden.codigo }}</td><td>{{ orden.producto }}</td><td>{{ orden.responsable }}</td>
+        <td class="num">{{ orden.planificadas }}</td><td class="num">{{ orden.producidas }}</td>
+        <td>
+          <div class="barra-progreso" role="progressbar" aria-valuenow="{{ orden.cumplimiento }}" aria-valuemin="0" aria-valuemax="100">
+            <span style="width:{{ orden.cumplimiento }}%"></span>
+          </div>
+          <small>{{ orden.cumplimiento }}%</small>
+        </td>
+        <td><span class="estado {{ 'e-aprobado' if orden.estado == 'Completada' else 'e-pendiente' }}">{{ orden.estado }}</span></td>
+      </tr>
+    {% else %}
+      <tr><td colspan="7">No hay órdenes de producción.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

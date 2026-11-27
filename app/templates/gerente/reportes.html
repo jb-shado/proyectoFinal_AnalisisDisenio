@@ -1,0 +1,54 @@
+{% extends "gerente/base.html" %}
+{% block titulo %}Reportes empresariales{% endblock %}
+{% block contenido %}
+<header class="barra">
+  <div><h1>Reportes empresariales</h1><p class="sub">Resumen financiero del periodo y corte actual de producción e inventarios.</p></div>
+  <a class="btn" href="{{ url_for('gerente.reporte_empresarial_csv', periodo=periodo) }}">Descargar reporte CSV</a>
+</header>
+
+<form class="filtros" method="get">
+  <label>Periodo del reporte
+    <select name="periodo">
+      {% for fila in periodos %}
+        <option value="{{ fila.periodo }}" {{ 'selected' if fila.periodo == periodo }}>{{ fila.periodo }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <button class="btn sec">Generar reporte</button>
+</form>
+
+<h2>Resultados financieros · {{ periodo }}</h2>
+<section class="kpis" aria-label="Reporte financiero">
+  <div class="kpi"><strong>Bs {{ "{:,.0f}".format(resumen.finanzas.ingresos) }}</strong><span>Ingresos</span></div>
+  <div class="kpi"><strong>Bs {{ "{:,.0f}".format(resumen.finanzas.costo_produccion) }}</strong><span>Costos de producción</span></div>
+  <div class="kpi"><strong>Bs {{ "{:,.0f}".format(resumen.finanzas.gastos_operativos) }}</strong><span>Gastos operativos</span></div>
+  <div class="kpi"><strong>Bs {{ "{:,.0f}".format(resumen.finanzas.utilidad_neta) }}</strong><span>Utilidad neta · {{ resumen.finanzas.margen }}%</span></div>
+</section>
+
+<h2>Indicadores operativos actuales</h2>
+<section class="kpis" aria-label="Reporte operativo">
+  <div class="kpi"><strong>{{ resumen.produccion_realizada }} / {{ resumen.produccion_planificada }}</strong><span>Unidades producidas / planificadas</span></div>
+  <div class="kpi"><strong>{{ resumen.cumplimiento_produccion }}%</strong><span>Cumplimiento de producción</span></div>
+  <div class="kpi"><strong>Bs {{ "{:,.2f}".format(resumen.valor_inventario) }}</strong><span>Valor actual del inventario</span></div>
+  <div class="kpi {{ 'alerta' if resumen.alertas_inventario }}"><strong>{{ resumen.alertas_inventario }}</strong><span>Alertas de stock</span></div>
+</section>
+
+<h2>Histórico financiero</h2>
+<div class="tabla-wrap">
+  <table>
+    <thead><tr><th>Periodo</th><th class="num">Ingresos (Bs)</th><th class="num">Costos (Bs)</th><th class="num">Gastos (Bs)</th><th class="num">Utilidad neta (Bs)</th><th class="num">Margen</th></tr></thead>
+    <tbody>
+    {% for fila in periodos %}
+      <tr>
+        <td>{{ fila.periodo }}</td>
+        <td class="num">{{ "{:,.0f}".format(fila.ingresos) }}</td>
+        <td class="num">{{ "{:,.0f}".format(fila.costo_produccion) }}</td>
+        <td class="num">{{ "{:,.0f}".format(fila.gastos_operativos) }}</td>
+        <td class="num">{{ "{:,.0f}".format(fila.utilidad_neta) }}</td>
+        <td class="num">{{ fila.margen }}%</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Gerencia{% endblock %} · ERP Alimentos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+  <style>
+    .demo{display:inline-block;background:#fff2cf;color:#765100;border:1px solid #e6ca82;border-radius:99px;padding:.2rem .65rem;font-size:.8rem;font-weight:600}
+    .barra-progreso{height:.65rem;background:#e8e6e0;border-radius:99px;overflow:hidden;min-width:100px}
+    .barra-progreso span{display:block;height:100%;background:#0f6e56}
+    .filtros select{min-width:180px}
+    .positivo{color:#0a3d30;font-weight:600}
+    .negativo{color:#9b2c2c;font-weight:600}
+    .numero{font-variant-numeric:tabular-nums;white-space:nowrap}
+  </style>
+</head>
+<body>
+<aside class="lateral">
+  <a class="marca" href="{{ url_for('gerente.panel') }}">ERP Alimentos</a>
+  <p class="rol">Rol: {{ rol }}</p>
+  <nav aria-label="Panel de gerencia">
+    {% for etiqueta, endpoint, descripcion in menu %}
+      {% set destino = url_for(endpoint) %}
+      {% set activo = request.path == destino or request.path.startswith(destino ~ '/') %}
+      <a href="{{ destino }}" class="{{ 'activo' if activo }}"{% if activo %} aria-current="page"{% endif %}>
+        {{ etiqueta }}<small>{{ descripcion }}</small>
+      </a>
+    {% endfor %}
+  </nav>
+</aside>
+<main class="contenido">
+  <div class="barra" style="margin-bottom:.75rem">
+    <span class="demo">Datos demostrativos</span>
+  </div>
+  {% block contenido %}{% endblock %}
+</main>
+</body>
+</html>
