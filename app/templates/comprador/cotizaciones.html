@@ -1,0 +1,38 @@
+{% extends "comprador/base.html" %}
+{% block titulo %}Cotizaciones{% endblock %}
+{% block contenido %}
+<div class="barra">
+  <div><h1>Comparación de precios históricos</h1><p class="sub">Compara precios unitarios registrados en órdenes de compra anteriores.</p></div>
+</div>
+<form class="filtros" method="get">
+  <label>Insumo
+    <select name="insumo">
+      <option value="">Todos los insumos</option>
+      {% for insumo in insumos %}
+        <option value="{{ insumo.id }}" {{ 'selected' if insumo_seleccionado == insumo.id }}>{{ insumo.nombre }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <button class="btn sec">Comparar</button>
+</form>
+{% if cotizaciones %}
+<div class="tabla-wrap">
+  <table>
+    <thead><tr><th>Insumo</th><th>Proveedor</th><th>Cantidad comprada</th><th>Precio unitario (Bs)</th><th>Orden</th><th>Fecha</th></tr></thead>
+    <tbody>
+    {% for oferta in cotizaciones %}
+      <tr>
+        <td>{{ oferta.insumo }}</td><td>{{ oferta.proveedor }}</td>
+        <td>{{ oferta.cantidad }} {{ oferta.unidad }}</td>
+        <td class="num">{{ "{:,.4f}".format(oferta.precio_unitario) }}</td>
+        <td>{{ oferta.numero_orden }}</td><td>{{ oferta.fecha }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="vacio">No hay cotizaciones para el filtro seleccionado.</p>
+{% endif %}
+<p class="sub" style="margin-top:1rem">El esquema actual no almacena cotizaciones vigentes; esta vista usa precios históricos de órdenes no anuladas.</p>
+{% endblock %}

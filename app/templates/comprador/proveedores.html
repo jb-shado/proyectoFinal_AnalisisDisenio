@@ -1,0 +1,49 @@
+{% extends "comprador/base.html" %}
+{% block titulo %}Proveedores{% endblock %}
+{% block contenido %}
+<div class="barra">
+  <div><h1>Proveedores</h1><p class="sub">Registro, datos de contacto y estado comercial.</p></div>
+  <a class="btn" href="{{ url_for('compras.proveedor_nuevo') }}">Registrar proveedor</a>
+</div>
+<form class="filtros" method="get">
+  <label>Buscar
+    <input name="q" value="{{ buscar }}" placeholder="Razón social, NIT o contacto">
+  </label>
+  <label>Estado
+    <select name="estado">
+      <option value="">Todos</option>
+      <option value="activo" {{ 'selected' if estado == 'activo' }}>Activo</option>
+      <option value="inactivo" {{ 'selected' if estado == 'inactivo' }}>Inactivo</option>
+    </select>
+  </label>
+  <button class="btn sec">Filtrar</button>
+</form>
+{% if proveedores %}
+<div class="tabla-wrap">
+  <table>
+    <thead><tr><th>Proveedor</th><th>NIT</th><th>Contacto</th><th>Teléfono</th><th>Correo</th><th>Calificación</th><th>Condiciones</th><th>Estado</th><th>Acciones</th></tr></thead>
+    <tbody>
+    {% for proveedor in proveedores %}
+      <tr>
+        <td>{{ proveedor.razon_social }}</td><td>{{ proveedor.nit or '—' }}</td>
+        <td>{{ proveedor.contacto or '—' }}</td><td>{{ proveedor.telefono or '—' }}</td>
+        <td>{{ proveedor.email or '—' }}</td>
+        <td>{{ "%.2f"|format(proveedor.calificacion or 0) }}</td>
+        <td>{{ proveedor.condiciones or '—' }}</td>
+        <td><span class="estado {{ 'e-activo' if proveedor.activo else 'e-baja' }}">{{ 'Activo' if proveedor.activo else 'Inactivo' }}</span></td>
+        <td class="acc">
+          <a class="btn sec chico" href="{{ url_for('compras.proveedor_editar', id_proveedor=proveedor.id) }}">Editar</a>
+          <form class="en-linea" method="post" action="{{ url_for('compras.proveedor_estado', id_proveedor=proveedor.id) }}">
+            <input type="hidden" name="accion" value="{{ 'desactivar' if proveedor.activo else 'activar' }}">
+            <button class="btn {{ 'peligro' if proveedor.activo else 'sec' }} chico">{{ 'Desactivar' if proveedor.activo else 'Activar' }}</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="vacio">No se encontraron proveedores.</p>
+{% endif %}
+{% endblock %}

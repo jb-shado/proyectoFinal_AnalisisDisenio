@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Compras{% endblock %} · ERP Alimentos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+  <style>
+    .campos{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1rem;align-items:end;margin-bottom:1rem}
+    .lineas-orden{display:grid;gap:.75rem}
+    .linea-orden{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:.75rem;align-items:end;border:1px solid var(--linea);border-radius:var(--radio);padding:.75rem}
+    .detalle{margin:.5rem 0 1rem}
+    .acciones{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+    .vencida{color:var(--rojo);font-weight:700}
+    @media(max-width:700px){.linea-orden{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<aside class="lateral">
+  <a class="marca" href="{{ url_for('compras.panel') }}">ERP Alimentos</a>
+  <p class="rol">Rol: {{ rol }}</p>
+  <nav aria-label="Módulo de compras">
+    {% for etiqueta, endpoint, descripcion in menu %}
+      {% set destino = url_for(endpoint) %}
+      {% set activo = request.path == destino or request.path.startswith(destino ~ '/') %}
+      <a href="{{ destino }}" class="{{ 'activo' if activo }}"{% if activo %} aria-current="page"{% endif %}>
+        {{ etiqueta }}<small>{{ descripcion }}</small>
+      </a>
+    {% endfor %}
+  </nav>
+</aside>
+<main class="contenido">
+  <div class="aviso" role="note">Datos de demostración en memoria; se reinician al detener la aplicación.</div>
+  {% for categoria, mensaje in get_flashed_messages(with_categories=true) %}
+    <div class="aviso {{ categoria }}" role="status">{{ mensaje }}</div>
+  {% endfor %}
+  {% block contenido %}{% endblock %}
+</main>
+</body>
+</html>

@@ -1,0 +1,36 @@
+{% extends "comprador/base.html" %}
+{% block titulo %}Solicitud {{ solicitud.numero }}{% endblock %}
+{% block contenido %}
+<div class="barra">
+  <div><h1>Solicitud {{ solicitud.numero }}</h1><p class="sub">Solicitante: {{ solicitud.solicitante }} · {{ solicitud.fecha }}</p></div>
+  <span class="estado {{ 'e-pendiente' if solicitud.estado == 'pendiente' else ('e-aprobado' if solicitud.estado in ('aprobada','atendida') else 'e-rechazado') }}">{{ solicitud.estado|capitalize }}</span>
+</div>
+<dl class="ficha">
+  <div><dt>Observación</dt><dd>{{ solicitud.observacion or 'Sin observaciones' }}</dd></div>
+  {% if solicitud.orden_id %}<div><dt>Orden vinculada</dt><dd>OC #{{ solicitud.orden_id }}</dd></div>{% endif %}
+</dl>
+<h2>Insumos solicitados</h2>
+<div class="tabla-wrap">
+  <table>
+    <thead><tr><th>Insumo</th><th>Cantidad</th><th>Unidad</th></tr></thead>
+    <tbody>{% for item in solicitud['items'] %}
+      <tr><td>{{ item.nombre_insumo }}</td><td>{{ item.cantidad }}</td><td>{{ item.unidad }}</td></tr>
+    {% endfor %}</tbody>
+  </table>
+</div>
+{% if solicitud.estado == 'pendiente' %}
+<div class="acciones" style="margin-top:1rem">
+  <form method="post" action="{{ url_for('compras.solicitud_estado', id_solicitud=solicitud.id) }}">
+    <input type="hidden" name="accion" value="aprobar">
+    <button class="btn">Aprobar solicitud</button>
+  </form>
+  <form method="post" action="{{ url_for('compras.solicitud_estado', id_solicitud=solicitud.id) }}">
+    <input type="hidden" name="accion" value="rechazar">
+    <button class="btn peligro">Rechazar</button>
+  </form>
+</div>
+{% elif solicitud.estado == 'aprobada' %}
+<a class="btn" href="{{ url_for('compras.orden_nueva', solicitud=solicitud.id) }}">Crear orden de compra</a>
+{% endif %}
+<p style="margin-top:1rem"><a href="{{ url_for('compras.solicitudes') }}">Volver a solicitudes</a></p>
+{% endblock %}

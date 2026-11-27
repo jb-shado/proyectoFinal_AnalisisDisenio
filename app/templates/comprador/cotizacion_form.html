@@ -1,0 +1,36 @@
+{% extends "comprador/base.html" %}
+{% block titulo %}Registrar cotización{% endblock %}
+{% block contenido %}
+<h1>Registrar cotización</h1>
+<p class="sub">Añade una oferta de proveedor para comparar precios y plazos.</p>
+<form method="post" class="campos tarjeta">
+  <label>Insumo *
+    <select name="insumo_id" required>
+      <option value="">Selecciona un insumo</option>
+      {% for insumo in insumos %}<option value="{{ insumo.id }}">{{ insumo.nombre }} ({{ insumo.unidad }})</option>{% endfor %}
+    </select>
+  </label>
+  <label>Proveedor *
+    <select name="proveedor_id" required>
+      <option value="">Selecciona un proveedor</option>
+      {% for proveedor in proveedores %}<option value="{{ proveedor.id }}">{{ proveedor.razon_social }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>Cantidad cotizada *
+    <input type="number" name="cantidad" min="0.001" step="0.001" required>
+  </label>
+  <label>Precio unitario (Bs) *
+    <input type="number" name="precio_unitario" min="0.0001" step="0.0001" required>
+  </label>
+  <label>Días de entrega *
+    <input type="number" name="dias_entrega" min="1" max="365" step="1" required>
+  </label>
+  <label>Vigencia hasta *
+    <input type="date" name="vigencia" min="{{ hoy }}" value="{{ vigencia }}" required>
+  </label>
+  <div class="ancho">
+    <button class="btn">Guardar cotización</button>
+    <a class="btn sec" href="{{ url_for('compras.cotizaciones') }}">Cancelar</a>
+  </div>
+</form>
+{% endblock %}

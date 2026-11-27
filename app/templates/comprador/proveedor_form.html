@@ -1,0 +1,33 @@
+{% extends "comprador/base.html" %}
+{% block titulo %}{{ 'Nuevo proveedor' if nuevo else 'Editar proveedor' }}{% endblock %}
+{% block contenido %}
+<h1>{{ 'Registrar proveedor' if nuevo else 'Modificar proveedor' }}</h1>
+<p class="sub">Mantén actualizados los datos comerciales para órdenes y cotizaciones.</p>
+<form method="post" class="campos tarjeta">
+  <label>Razón social *
+    <input name="razon_social" maxlength="150" required value="{{ proveedor.get('razon_social', '') }}">
+  </label>
+  <label>NIT
+    <input name="nit" maxlength="20" value="{{ proveedor.get('nit', '') }}">
+  </label>
+  <label>Nombre de contacto
+    <input name="contacto" maxlength="100" value="{{ proveedor.get('contacto', '') }}">
+  </label>
+  <label>Teléfono
+    <input name="telefono" maxlength="20" value="{{ proveedor.get('telefono', '') }}">
+  </label>
+  <label>Correo electrónico
+    <input type="email" name="email" maxlength="150" value="{{ proveedor.get('email', '') }}">
+  </label>
+  <label>Dirección
+    <input name="direccion" maxlength="255" value="{{ proveedor.get('direccion', '') }}">
+  </label>
+  <label class="ancho">Condiciones comerciales
+    <textarea name="condiciones" maxlength="1000">{{ proveedor.get('condiciones', '') }}</textarea>
+  </label>
+  <div class="ancho">
+    <button class="btn">{{ 'Guardar proveedor' if nuevo else 'Guardar cambios' }}</button>
+    <a class="btn sec" href="{{ url_for('compras.proveedores') }}">Cancelar</a>
+  </div>
+</form>
+{% endblock %}

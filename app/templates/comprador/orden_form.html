@@ -1,0 +1,100 @@
+{% extends "comprador/base.html" %}
+{% block titulo %}{{ 'Nueva orden' if nueva else 'Editar orden' }}{% endblock %}
+{% block contenido %}
+<h1>{{ 'Crear orden de compra' if nueva else 'Modificar orden de compra' }}</h1>
+<p class="sub">Selecciona proveedor, fecha y uno o más insumos. Los importes se calculan al guardar.</p>
+<form method="post" class="tarjeta">
+  <div class="campos">
+    <label>Proveedor *
+      <select name="proveedor_id" required>
+        <option value="">Selecciona un proveedor</option>
+        {% for proveedor in proveedores %}
+          <option value="{{ proveedor.id }}" {{ 'selected' if orden.proveedor_id|string == proveedor.id|string }}>
+            {{ proveedor.razon_social }}{{ ' (inactivo; existente)' if not proveedor.activo }}
+          </option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Solicitud aprobada (opcional)
+      <select name="solicitud_id">
+        <option value="">Orden directa</option>
+        {% for solicitud in solicitudes %}
+          <option value="{{ solicitud.id }}" {{ 'selected' if orden.solicitud_id|string == solicitud.id|string }}>
+            {{ solicitud.numero }} · {{ solicitud.estado|capitalize }}
+          </option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Fecha de entrega esperada *
+      <input type="date" name="fecha_entrega_esperada" required value="{{ orden.fecha_entrega_esperada }}">
+    </label>
+    <label>Impuesto (%)
+      <input type="number" name="impuesto_porcentaje" min="0" max="100" step="0.01" required value="{{ orden.impuesto_porcentaje }}">
+    </label>
+    <label class="ancho">Observación
+      <input name="observacion" maxlength="500" value="{{ orden.observacion }}">
+    </label>
+  </div>
+
+  <h2>Detalle de artículos</h2>
+  <div class="lineas-orden" id="lineas-orden">
+    {% for item in orden['items'] %}
+    <div class="linea-orden">
+      <label>Insumo *
+        <select name="insumo_id" required>
+          <option value="">Selecciona un insumo</option>
+          {% for insumo in insumos %}
+            <option value="{{ insumo.id }}" {{ 'selected' if item.insumo_id|string == insumo.id|string }}>
+              {{ insumo.nombre }} ({{ insumo.unidad }})
+            </option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Cantidad *
+        <input type="number" name="cantidad" min="0.001" max="999999999.999" step="0.001" required value="{{ item.cantidad }}">
+      </label>
+      <label>Precio unitario (Bs) *
+        <input type="number" name="precio_unitario" min="0.0001" max="99999999.9999" step="0.0001" required value="{{ item.precio_unitario }}">
+      </label>
+      <button type="button" class="btn peligro chico quitar-linea">Quitar</button>
+    </div>
+    {% endfor %}
+  </div>
+  <button type="button" class="btn sec" id="agregar-linea">Agregar otro insumo</button>
+  <p class="sub" style="margin-top:1rem">No repitas un insumo en varias líneas. Para una solicitud vinculada, la orden debe cubrir las cantidades requeridas.</p>
+  <button class="btn">{{ 'Crear orden' if nueva else 'Guardar cambios' }}</button>
+  <a class="btn sec" href="{{ url_for('compras.ordenes') }}">Cancelar</a>
+</form>
+
+<template id="plantilla-linea">
+  <div class="linea-orden">
+    <label>Insumo *
+      <select name="insumo_id" required>
+        <option value="">Selecciona un insumo</option>
+        {% for insumo in insumos %}
+          <option value="{{ insumo.id }}">{{ insumo.nombre }} ({{ insumo.unidad }})</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Cantidad *
+      <input type="number" name="cantidad" min="0.001" max="999999999.999" step="0.001" required>
+    </label>
+    <label>Precio unitario (Bs) *
+      <input type="number" name="precio_unitario" min="0.0001" max="99999999.9999" step="0.0001" required>
+    </label>
+    <button type="button" class="btn peligro chico quitar-linea">Quitar</button>
+  </div>
+</template>
+<script>
+  const lineasOrden = document.getElementById("lineas-orden");
+  const plantillaLinea = document.getElementById("plantilla-linea");
+  document.getElementById("agregar-linea").addEventListener("click", () => {
+    lineasOrden.appendChild(plantillaLinea.content.cloneNode(true));
+  });
+  lineasOrden.addEventListener("click", (evento) => {
+    if (evento.target.classList.contains("quitar-linea") && lineasOrden.children.length > 1) {
+      evento.target.closest(".linea-orden").remove();
+    }
+  });
+</script>
+{% endblock %}
