@@ -1,6 +1,6 @@
 {% extends "vendedor/base.html" %}
 {% from "vendedor/macros.html" import tabla, estado %}
-{% set bp = 'vendedor' %}
+{% set bp = 'ventas' %}
 {% block titulo %}Reclamo {{ r.numero_reclamo }}{% endblock %}
 {% block contenido %}
 <a href="{{ url_for(bp ~ '.reclamos') }}">Volver a reclamos</a>
