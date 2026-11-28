@@ -1,0 +1,18 @@
+{% extends "portal_cliente/base.html" %}
+{% block titulo %}Iniciar sesión{% endblock %}
+{% block contenido %}
+<div class="acceso">
+  <h1>Portal de clientes</h1>
+  <p class="sub">Haz tus pedidos, revisa tus facturas y registra reclamos. Este acceso es distinto al del personal de la empresa.</p>
+  <form method="post">
+    <label>Usuario <input name="usuario" required autocomplete="username" value="{{ usuario }}" autofocus></label>
+    <label>Contraseña <input name="clave" type="password" required autocomplete="current-password"></label>
+    <button class="btn">Ingresar</button>
+  </form>
+  <p class="nota">Después de 3 intentos fallidos la cuenta se bloquea.</p>
+  <div class="demo">
+    <strong>Cuentas de prueba del prototipo</strong> (contraseña <code>{{ clave_demo }}</code>)
+    <ul>{% for u, n in demo %}<li><code>{{ u }}</code> · {{ n }}</li>{% endfor %}</ul>
+  </div>
+</div>
+{% endblock %}

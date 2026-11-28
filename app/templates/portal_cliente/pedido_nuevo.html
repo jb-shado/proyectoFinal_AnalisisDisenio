@@ -1,0 +1,40 @@
+{% extends "portal_cliente/base.html" %}
+{% block titulo %}Nuevo pedido{% endblock %}
+{% block contenido %}
+<h1>Nuevo pedido</h1>
+<p class="sub">Indica cuánto quieres de cada producto. Tu pedido queda <strong>pendiente</strong> hasta que tu vendedor confirme el stock. <span class="regla">RN-14</span></p>
+<form method="post">
+  <div class="tabla-wrap"><table>
+    <thead><tr><th>Producto</th><th class="num">Precio Bs</th><th class="num">Disponible</th><th class="num">Cantidad</th></tr></thead>
+    <tbody>
+    {% for p in productos %}
+      {% set k = 'cant_' ~ p.id_producto %}
+      <tr class="{{ 'resaltado' if form.get(k) }}">
+        <td>{{ p.nombre }} <small>({{ p.codigo }})</small></td>
+        <td class="num">{{ '%.2f'|format(p.precio_venta) }}</td>
+        <td class="num {{ 'sin-stock' if p.stock <= 0 }}">{{ p.stock if p.stock > 0 else 'Agotado' }}</td>
+        <td class="num"><input class="corto" type="number" min="0" max="{{ p.stock }}" step="1" value="{{ form.get(k, 0) }}"
+             name="{{ k }}" data-precio="{{ p.precio_venta }}" {{ 'disabled' if p.stock <= 0 }} aria-label="Cantidad de {{ p.nombre }}"></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  <p class="total">Subtotal Bs <span id="sub">0.00</span> · IVA Bs <span id="iva">0.00</span> · Total Bs <span id="tot">0.00</span></p>
+  <div class="campos">
+    <label>Entrega deseada <input type="date" name="entrega" min="{{ manana }}" value="{{ form.get('entrega', manana) }}"></label>
+    <label class="ancho">Observación <input name="observacion" value="{{ form.get('observacion','') }}" placeholder="Horario de recepción, punto de entrega..."></label>
+    <div><button class="btn">Enviar pedido</button></div>
+  </div>
+</form>
+<script>
+  const IVA = {{ iva }};
+  const entradas = document.querySelectorAll('input[data-precio]');
+  function recalcular(){
+    let s = 0; entradas.forEach(i => s += (+i.value || 0) * +i.dataset.precio);
+    document.getElementById('sub').textContent = s.toFixed(2);
+    document.getElementById('iva').textContent = (s * IVA).toFixed(2);
+    document.getElementById('tot').textContent = (s * (1 + IVA)).toFixed(2);
+  }
+  entradas.forEach(i => i.addEventListener('input', recalcular)); recalcular();
+</script>
+{% endblock %}

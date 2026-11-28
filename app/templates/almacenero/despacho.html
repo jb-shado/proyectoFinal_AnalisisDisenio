@@ -1,0 +1,72 @@
+{% extends "almacenero/base.html" %}
+{% from "almacenero/macros.html" import tabla, estado, alerta %}
+{% block titulo %}Despacho FEFO{% endblock %}
+{% block contenido %}
+<h1>Despacho FEFO</h1>
+<p class="sub">Indica qué sale y cuánto. El sistema sugiere los lotes en orden FEFO: primero sale el que vence antes. Nunca usa lotes vencidos, agotados, en cuarentena o rechazados. <span class="regla">RN-07</span></p>
+
+{% if pendientes %}
+<h2>Solicitudes que esperan salida</h2>
+<div class="tabla-wrap"><table>
+  <thead><tr><th>Documento</th><th>Destino</th><th>Ítem</th><th class="num">Cantidad</th><th><span class="sr">Acciones</span></th></tr></thead>
+  <tbody>{% for s in pendientes %}<tr><td>{{ s.documento }}</td><td>{{ s.destino }}</td><td>{{ s.item }}</td><td class="num">{{ s.cantidad }}</td>
+    <td class="acc"><a class="btn sec chico" href="{{ url_for('almacen.despacho', tipo=s.tipo, id_item=s.id_item, cantidad=s.cantidad, documento=s.documento, id_solicitud=s.id_solicitud) }}">Preparar</a></td></tr>{% endfor %}</tbody>
+</table></div>
+{% endif %}
+
+<h2>1. Qué vas a despachar</h2>
+<form class="campos" method="get">
+  <label>Tipo
+    <select name="tipo" onchange="this.form.id_item.value='';this.form.submit()">
+      <option value="insumo" {{ 'selected' if tipo == 'insumo' }}>Insumo (a producción)</option>
+      <option value="producto" {{ 'selected' if tipo == 'producto' }}>Producto terminado (a cliente)</option>
+    </select>
+  </label>
+  <label>Ítem
+    <select name="id_item" required>
+      <option value="">Elige</option>
+      {% for i in items %}<option value="{{ i.id }}" {{ 'selected' if i.id == id_item }}>{{ i.nombre }} ({{ i.unidad }})</option>{% endfor %}
+    </select>
+  </label>
+  <label>Cantidad <input type="number" name="cantidad" min="0.001" step="0.001" required value="{{ '%g'|format(cantidad) if cantidad else '' }}"></label>
+  <label>Documento de referencia <input name="documento" placeholder="OP-2026-031 o PED-2026-003" value="{{ documento }}"></label>
+  <input type="hidden" name="id_solicitud" value="{{ id_solicitud }}">
+  <div><button class="btn sec">Sugerir lotes</button></div>
+</form>
+
+{% if id_item and cantidad %}
+<h2>2. Lotes sugeridos (FEFO)</h2>
+{% if plan %}
+<div class="tabla-wrap"><table>
+  <thead><tr><th>Orden</th><th>Lote</th><th>Vence</th><th class="num">Días</th><th class="num">Hay</th><th class="num">Sale</th><th class="num">Queda</th><th>Alerta</th></tr></thead>
+  <tbody>{% for p in plan %}<tr class="fila-{{ p.alerta }}"><td>{{ loop.index }}</td><td>{{ p.numero_lote }}</td><td>{{ p.fecha_vencimiento or '—' }}</td>
+    <td class="num">{{ p.dias if p.dias is not none else '—' }}</td><td class="num">{{ '%g'|format(p.cantidad_actual) }}</td>
+    <td class="num"><strong>{{ '%g'|format(p.tomar) }}</strong></td><td class="num">{{ '%g'|format(p.queda) }}{% if p.queda == 0 %} <small>(agotado)</small>{% endif %}</td>
+    <td>{{ alerta(p.alerta) }}</td></tr>{% endfor %}</tbody>
+</table></div>
+{% endif %}
+{% if falta > 0 %}
+  <div class="aviso error" role="alert">Stock utilizable insuficiente: hay {{ '%g'|format(disponible) }} y se piden {{ '%g'|format(cantidad) }}. Faltan {{ '%g'|format(falta) }}.</div>
+{% elif plan %}
+  <form method="post" style="margin-top:1rem">
+    <input type="hidden" name="tipo" value="{{ tipo }}"><input type="hidden" name="id_item" value="{{ id_item }}">
+    <input type="hidden" name="cantidad" value="{{ cantidad }}"><input type="hidden" name="id_solicitud" value="{{ id_solicitud }}">
+    <div class="campos">
+      <label>Documento de referencia <input name="documento" required value="{{ documento }}" placeholder="OP-2026-031"></label>
+      <div><button class="btn">3. Confirmar despacho</button></div>
+    </div>
+    <p class="nota">Al confirmar se descuenta cada lote; el que llega a cero pasa a <em>agotado</em> (RN-08).</p>
+  </form>
+{% endif %}
+{% if excluidos %}
+<h2>Lotes que no se pueden usar</h2>
+<div class="tabla-wrap"><table>
+  <thead><tr><th>Lote</th><th>Vence</th><th class="num">Cantidad</th><th>Motivo</th></tr></thead>
+  <tbody>{% for e in excluidos %}<tr><td>{{ e.numero_lote }}</td><td>{{ e.fecha_vencimiento or '—' }}</td><td class="num">{{ '%g'|format(e.cantidad_actual) }}</td><td>{{ estado(e.razon) }}</td></tr>{% endfor %}</tbody>
+</table></div>
+{% endif %}
+{% endif %}
+
+<h2>Últimas salidas</h2>
+{{ tabla([('Fecha','fecha'),('Ítem','item'),('Lote','numero_lote'),('Cantidad','cantidad'),('Documento','documento_ref'),('Responsable','responsable')], salidas, 'Aún no hay salidas registradas.') }}
+{% endblock %}

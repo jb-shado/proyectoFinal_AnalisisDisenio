@@ -1,0 +1,61 @@
+{% extends "almacenero/base.html" %}
+{% from "almacenero/macros.html" import tabla %}
+{% block titulo %}Inventario físico{% endblock %}
+{% block contenido %}
+<h1>Inventario físico y ajustes</h1>
+<p class="sub">Escribe lo que contaste en cada lote. Si no coincide con el sistema, la diferencia se ajusta y debes justificarla. <span class="regla">RN-09</span></p>
+
+<form class="filtros" method="get">
+  <label>Contar
+    <select name="tipo" onchange="this.form.submit()">
+      <option value="insumo" {{ 'selected' if tipo == 'insumo' }}>Insumos</option>
+      <option value="producto" {{ 'selected' if tipo == 'producto' }}>Productos terminados</option>
+    </select>
+  </label>
+  <noscript><button class="btn sec">Cambiar</button></noscript>
+</form>
+
+<form method="post">
+  <input type="hidden" name="tipo" value="{{ tipo }}">
+  {% if lotes %}
+  <div class="tabla-wrap"><table>
+    <thead><tr><th>Ítem</th><th>Lote</th><th>Vence</th><th class="num">Sistema</th><th class="num">Contado</th><th class="num">Diferencia</th><th>Justificación</th></tr></thead>
+    <tbody>{% for f in lotes %}
+      <tr data-sistema="{{ f.cantidad_actual }}">
+        <td>{{ f.item }}</td><td>{{ f.numero_lote }}</td><td>{{ f.fecha_vencimiento or '—' }}</td>
+        <td class="num">{{ '%g'|format(f.cantidad_actual) }} {{ f.unidad }}</td>
+        <td class="num"><input class="corto contado" type="number" min="0" step="0.001" name="contado_{{ f.id_lote }}"
+             value="{{ form.get('contado_' ~ f.id_lote, '') }}" aria-label="Cantidad contada del lote {{ f.numero_lote }}"></td>
+        <td class="num dif">—</td>
+        <td><input name="just_{{ f.id_lote }}" value="{{ form.get('just_' ~ f.id_lote, '') }}" placeholder="Solo si hay diferencia"
+             aria-label="Justificación del lote {{ f.numero_lote }}"></td>
+      </tr>{% endfor %}</tbody>
+  </table></div>
+  <p class="nota">Deja vacío lo que no contaste.</p>
+  <button class="btn">Registrar conteo y ajustes</button>
+  {% else %}<p class="vacio">No hay lotes con stock para contar.</p>{% endif %}
+</form>
+
+<h2>Inventarios anteriores</h2>
+{% for inv in historial %}
+<section class="tarjeta">
+  <header><div><strong>INV-{{ '%03d'|format(inv.id_inventario) }}</strong> · {{ inv.fecha }} · {{ inv.tipo }}s<br>
+    <small>{{ inv.lotes_contados }} lotes contados · {{ inv.ajustes|length }} ajuste(s) · {{ inv.responsable }}</small></div></header>
+  {{ tabla([('Ítem','item'),('Lote','numero_lote'),('Sistema','cantidad_sistema'),('Contado','cantidad_contada'),('Diferencia','diferencia'),('Justificación','justificacion')],
+           inv.ajustes, 'El conteo coincidió con el sistema; no hubo ajustes.') }}
+</section>
+{% else %}<p class="vacio">Todavía no se hizo ningún inventario físico.</p>{% endfor %}
+
+<script>
+  document.querySelectorAll('tr[data-sistema]').forEach(tr => {
+    const inp = tr.querySelector('.contado'), out = tr.querySelector('.dif');
+    const calc = () => {
+      if (inp.value === '') { out.textContent = '—'; out.className = 'num dif'; return; }
+      const d = +(+inp.value - +tr.dataset.sistema).toFixed(3);
+      out.textContent = (d > 0 ? '+' : '') + d;
+      out.className = 'num dif' + (d ? ' sin-stock' : '');
+    };
+    inp.addEventListener('input', calc); calc();
+  });
+</script>
+{% endblock %}

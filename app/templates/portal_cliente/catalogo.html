@@ -1,0 +1,25 @@
+{% extends "portal_cliente/base.html" %}
+{% from "portal_cliente/macros.html" import estado %}
+{% block titulo %}Catálogo{% endblock %}
+{% block contenido %}
+<h1>Catálogo y disponibilidad</h1>
+<p class="sub">Productos terminados aprobados por calidad y no vencidos. La disponibilidad se actualiza con cada venta.</p>
+<form class="filtros" method="get">
+  <label>Buscar <input name="q" value="{{ buscar }}" placeholder="Nombre del producto"></label>
+  <button class="btn sec">Buscar</button>
+</form>
+{% if productos %}
+<div class="catalogo">
+  {% for p in productos %}
+  <article class="producto">
+    <small>{{ p.codigo }}</small>
+    <strong>{{ p.nombre }}</strong>
+    <span class="precio">Bs {{ '%.2f'|format(p.precio_venta) }}</span>
+    <span>{{ estado(p.disponibilidad) }} {% if p.stock > 0 %}<small>{{ p.stock }} unidades</small>{% endif %}</span>
+    {% if p.stock > 0 %}<a class="btn chico" href="{{ url_for('cliente.pedido_nuevo', producto=p.id_producto) }}">Pedir</a>
+    {% else %}<span class="btn sec chico" aria-disabled="true">Sin stock</span>{% endif %}
+  </article>
+  {% endfor %}
+</div>
+{% else %}<p class="vacio">No encontramos productos con ese nombre.</p>{% endif %}
+{% endblock %}

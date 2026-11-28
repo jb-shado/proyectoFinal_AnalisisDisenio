@@ -1,0 +1,42 @@
+{% extends "almacenero/base.html" %}
+{% from "almacenero/macros.html" import kpi, atajos, tabla, alerta %}
+{% block titulo %}Panel del almacén{% endblock %}
+{% block contenido %}
+<h1>Almacén</h1>
+<p class="sub">Lo que vence pronto, lo que hay que reponer y lo que llega hoy.</p>
+<div class="kpis">
+  {{ kpi(kpis.por_vencer, 'Lotes por vencer (30 días)', true) }}
+  {{ kpi(kpis.vencidos, 'Lotes vencidos con stock', true) }}
+  {{ kpi(kpis.stock_bajo, 'Insumos bajo el mínimo', true) }}
+  {{ kpi(kpis.por_recibir, 'Líneas de compra por recibir') }}
+  {{ kpi(kpis.recepciones_hoy, 'Recepciones de hoy') }}
+  {{ kpi(kpis.solicitudes, 'Despachos pendientes') }}
+</div>
+{{ atajos(menu) }}
+
+{% if vencidos %}
+<h2>Lotes vencidos</h2>
+<div class="aviso error" role="alert">Hay {{ vencidos|length }} lote(s) vencido(s) con stock. No se pueden despachar; dalos de baja desde
+  <a href="{{ url_for('almacen.existencias', alerta='atencion') }}">Existencias por lote</a>.</div>
+{% endif %}
+
+<h2>Productos e insumos por vencer</h2>
+{% if por_vencer %}
+<div class="tabla-wrap"><table>
+  <thead><tr><th>Tipo</th><th>Ítem</th><th>Lote</th><th>Vence</th><th class="num">Días</th><th class="num">Cantidad</th><th>Alerta</th></tr></thead>
+  <tbody>{% for f in por_vencer %}
+    <tr class="fila-{{ f.alerta }}"><td>{{ f.tipo|capitalize }}</td><td>{{ f.item }}</td><td>{{ f.numero_lote }}</td>
+      <td>{{ f.fecha_vencimiento }}</td><td class="num">{{ f.dias }}</td><td class="num">{{ '%g'|format(f.cantidad_actual) }} {{ f.unidad }}</td>
+      <td>{{ alerta(f.alerta) }}</td></tr>{% endfor %}</tbody>
+</table></div>
+{% else %}<p class="vacio">Ningún lote vence en los próximos 30 días.</p>{% endif %}
+
+<h2>Insumos que hay que reponer</h2>
+{{ tabla([('Código','codigo'),('Insumo','nombre'),('Stock actual','stock_actual'),('Mínimo','stock_minimo'),('Unidad','unidad'),('Estado','estado_stock')],
+         stock_bajo, 'Todos los insumos están sobre su stock mínimo.') }}
+<p class="nota">Con el stock en el mínimo o por debajo, el sistema avisa al comprador para generar la solicitud de compra (RN-04).</p>
+
+<h2>Últimas recepciones</h2>
+{{ tabla([('Fecha','fecha'),('Orden','numero_orden'),('Insumo','insumo'),('Lote','numero_lote'),('Vence','fecha_vencimiento'),('Cantidad','cantidad'),('Unidad','unidad')],
+         recepciones, 'Aún no hay recepciones.') }}
+{% endblock %}
